@@ -9,14 +9,10 @@ import * as schema from "./schema";
  * so throwing here would make the Vercel build fail before it ever runs.
  * Instead we warn loudly and let the first real query surface a clear error.
  */
-const databaseUrl = process.env.DATABASE_URL;
+const databaseUrl =
+  process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.DATABASE_URL_UNPOOLED;
 
-if (!databaseUrl) {
-  console.warn(
-    "[db] DATABASE_URL is not set. The build will continue, but every database " +
-      "request will fail until you configure DATABASE_URL in your environment."
-  );
-}
+export const dbConfigured = Boolean(databaseUrl);
 
 /**
  * Managed Postgres providers used on Vercel (Neon, Supabase, Vercel Postgres,

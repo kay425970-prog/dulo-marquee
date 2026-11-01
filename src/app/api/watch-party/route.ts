@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
+import { dbUnavailable, dbConfigured } from "@/lib/api-guards";
 import { watchParties, WatchPartyMessage } from "@/db/schema";
 import { ensureDbInitialized } from "@/lib/db-bootstrap";
 import { desc, eq } from "drizzle-orm";
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
+    if (!dbConfigured) return dbUnavailable({ parties: [], party: null });
     await ensureDbInitialized();
     const roomCode = req.nextUrl.searchParams.get("roomCode");
 

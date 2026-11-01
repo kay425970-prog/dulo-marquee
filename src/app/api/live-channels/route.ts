@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
+import { dbUnavailable, dbConfigured } from "@/lib/api-guards";
 import { customLiveChannels } from "@/db/schema";
 import { ensureDbInitialized } from "@/lib/db-bootstrap";
 import { desc, eq } from "drizzle-orm";
@@ -57,6 +58,7 @@ function parseM3uText(raw: string): Array<{
 
 export async function GET() {
   try {
+    if (!dbConfigured) return dbUnavailable({ channels: [] });
     await ensureDbInitialized();
     const rows = await db
       .select()

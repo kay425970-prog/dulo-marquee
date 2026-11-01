@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
+import { dbUnavailable, dbConfigured } from "@/lib/api-guards";
 import { libraryItems } from "@/db/schema";
 import { ensureDbInitialized } from "@/lib/db-bootstrap";
 import { and, eq } from "drizzle-orm";

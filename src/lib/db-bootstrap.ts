@@ -8,10 +8,15 @@ import {
   crmDeals,
 } from "@/db/schema";
 import { eq, like, sql } from "drizzle-orm";
+import { dbConfigured } from "@/db";
 
 let initPromise: Promise<void> | null = null;
 
 export async function ensureDbInitialized(): Promise<void> {
+  // If no database is configured, skip initialization so builds and pages still
+  // work; API handlers will return graceful empty/fallback results instead of
+  // crashing. Set DATABASE_URL (or POSTGRES_URL) to enable full persistence.
+  if (!dbConfigured) return;
   if (initPromise) return initPromise;
 
   initPromise = (async () => {

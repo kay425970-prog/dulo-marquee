@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { and, eq, gt } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions, users } from "@/db/schema";
+import { dbConfigured } from "@/db";
 import { ensureDbInitialized } from "@/lib/db-bootstrap";
 
 export const SESSION_COOKIE = "dulo_session";
@@ -58,6 +59,7 @@ export async function clearSessionCookie() {
 }
 
 export async function getSessionUser(): Promise<SessionUser | null> {
+  if (!dbConfigured) return null;
   await ensureDbInitialized();
   const store = await cookies();
   const token = store.get(SESSION_COOKIE)?.value;

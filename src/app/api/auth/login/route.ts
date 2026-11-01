@@ -9,6 +9,13 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
+    const { dbConfigured } = await import("@/db");
+    if (!dbConfigured) {
+      return NextResponse.json(
+        { error: "Database not configured yet. Set DATABASE_URL in Vercel, then redeploy." },
+        { status: 503 }
+      );
+    }
     await ensureDbInitialized();
     const body = await req.json();
     const email = String(body.email || "").trim().toLowerCase();

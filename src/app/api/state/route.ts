@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
+import { dbUnavailable, dbConfigured } from "@/lib/api-guards";
 import { profiles, libraryItems, customCollections } from "@/db/schema";
 import { ensureDbInitialized } from "@/lib/db-bootstrap";
 import { getSessionUser } from "@/lib/auth";
@@ -9,6 +10,15 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
+    if (!dbConfigured) {
+      return dbUnavailable({
+        profiles: [],
+        activeProfile: null,
+        library: [],
+        collections: [],
+        user: null,
+      });
+    }
     await ensureDbInitialized();
     const user = await getSessionUser();
     const profileIdParam = req.nextUrl.searchParams.get("profileId");

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
+import { dbUnavailable, dbConfigured } from "@/lib/api-guards";
 import {
   crmDeals,
   profiles,
@@ -14,6 +15,9 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    if (!dbConfigured) {
+      return dbUnavailable({ deals: [], metrics: null, profiles: [] });
+    }
     await ensureDbInitialized();
     const [deals, allProfiles, allLib, allReviews, allParties] =
       await Promise.all([
