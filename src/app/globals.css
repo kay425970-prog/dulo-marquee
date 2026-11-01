@@ -1,0 +1,329 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  --color-background: #0a0a0a;
+  --color-foreground: #fafafa;
+  --color-card: #171717;
+  --color-muted: #1c1c1c;
+  --color-muted-foreground: #a3a3a3;
+  --color-primary: #da1b1b;
+  --color-primary-foreground: #fafafa;
+  --color-primary-text: #ff8585;
+  --color-secondary: #171717;
+  --color-accent: #4f0d0d;
+  --color-border: #292929;
+  --color-input: #292929;
+  --color-ring: #da1b1b;
+  --color-sidebar: #0d0d0d;
+
+  --beta-surface: var(--color-card);
+  --beta-raised: #151515;
+  --beta-inset: #171717;
+  --beta-border: rgba(255, 255, 255, 0.09);
+  --beta-border-strong: rgba(255, 255, 255, 0.18);
+  --beta-accent: #da1b1b;
+  --beta-focus: #ed7c7c;
+}
+
+html {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  scroll-behavior: smooth;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+body {
+  background-color: var(--color-background);
+  color: #f2f2f2;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============ DULO.MOV BETA-UI DESIGN SYSTEM ============ */
+.beta-ui {
+  background: var(--color-background);
+  color: #f2f2f2;
+  min-height: 100dvh;
+}
+
+.beta-ui :where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--beta-focus);
+  outline-offset: 3px;
+}
+
+/* dulo.mov Section Horizontal Padding */
+.dulo-rail-px {
+  padding-inline: 1.25rem;
+}
+@media (min-width: 640px) {
+  .dulo-rail-px {
+    padding-inline: 2rem;
+  }
+}
+@media (min-width: 768px) {
+  .dulo-rail-px {
+    padding-inline: 3rem;
+  }
+}
+@media (min-width: 1024px) {
+  .dulo-rail-px {
+    padding-inline: 3.5rem;
+  }
+}
+@media (min-width: 1280px) {
+  .dulo-rail-px {
+    padding-inline: 4rem;
+  }
+}
+@media (min-width: 1536px) {
+  .dulo-rail-px {
+    padding-inline: 5rem;
+  }
+}
+
+/* dulo.mov Hero Image Bottom Mask & Ambient Bleed */
+.beta-hero-image,
+.beta-hero-shade {
+  -webkit-mask-image: linear-gradient(#000 0% 62%, transparent 100%);
+  mask-image: linear-gradient(#000 0% 62%, transparent 100%);
+}
+
+.beta-hero-ambient {
+  z-index: 0;
+  background-position: center 55%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: blur(32px) brightness(0.55) saturate(1.4);
+  opacity: 0.68;
+  height: 460px;
+  top: calc(100% - 190px);
+  -webkit-mask-image: linear-gradient(transparent, #000 27% 55%, transparent);
+  mask-image: linear-gradient(transparent, #000 27% 55%, transparent);
+}
+
+.beta-hero-logo {
+  filter: brightness(0) invert(1) drop-shadow(0 8px 22px rgba(0, 0, 0, 0.8));
+}
+
+.text-shadow-hero {
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.72);
+}
+
+/* dulo.mov Action Buttons */
+.beta-action {
+  border: 1px solid var(--beta-border);
+  border-radius: 16px;
+  transition: background-color 0.18s, border-color 0.18s, box-shadow 0.18s,
+    transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.09),
+    0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.beta-action:hover {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 8px 20px rgba(0, 0, 0, 0.42),
+    0 0 0 3px rgba(218, 27, 27, 0.12);
+}
+
+.beta-action:active {
+  transform: scale(0.98);
+}
+
+/* dulo.mov Floating Sidebar */
+.beta-sidebar {
+  border: 1px solid var(--beta-border-strong);
+  background: var(--color-sidebar);
+  border-radius: 30px;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.55),
+    inset 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.beta-nav-item[aria-current="page"] {
+  background: rgba(218, 27, 27, 0.18);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(218, 27, 27, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.24);
+}
+
+.beta-nav-item:not([aria-current="page"]):hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+/* dulo.mov Mobile Header & Bottom Dock */
+.beta-mobile-header {
+  background: linear-gradient(
+    180deg,
+    rgba(13, 13, 13, 0.92) 0%,
+    rgba(13, 13, 13, 0.55) 58%,
+    transparent 100%
+  );
+}
+
+.beta-mobile-dock {
+  border-top: 1px solid var(--beta-border-strong);
+  background: rgba(13, 13, 13, 0.94);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 -16px 36px rgba(0, 0, 0, 0.4);
+}
+
+.beta-dock-link {
+  position: relative;
+}
+
+.beta-dock-link[aria-current="page"]::before {
+  content: "";
+  background: var(--beta-accent);
+  border-radius: 0 0 2px 2px;
+  width: 24px;
+  height: 2px;
+  position: absolute;
+  top: 0;
+}
+
+/* dulo.mov Channels & Apps Service Cards */
+.beta-provider-rail {
+  isolation: isolate;
+}
+
+.beta-provider-rail::before {
+  content: "";
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+      42% 75% at 12% 45%,
+      rgba(87, 49, 67, 0.21),
+      transparent 80%
+    ),
+    radial-gradient(
+      42% 70% at 83% 25%,
+      rgba(33, 62, 80, 0.19),
+      transparent 80%
+    );
+  position: absolute;
+  inset: -2rem 0 -3rem;
+  -webkit-mask-image: linear-gradient(transparent, #000 27% 73%, transparent);
+  mask-image: linear-gradient(transparent, #000 27% 73%, transparent);
+}
+
+.beta-service-card {
+  background: radial-gradient(
+      circle at 50% 12%,
+      color-mix(in srgb, var(--service-tint, #da1b1b) 28%, transparent),
+      transparent 63%
+    ),
+    linear-gradient(155deg, #161616, #141414 76%);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.22s, box-shadow 0.22s;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.08),
+    0 10px 28px rgba(0, 0, 0, 0.3);
+}
+
+.beta-service-card::before {
+  content: "";
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(rgba(255, 255, 255, 0.07), transparent 42%);
+  position: absolute;
+  inset: 0;
+}
+
+.beta-service-logo {
+  background: rgba(7, 7, 9, 0.44);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.05),
+    0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+.beta-service-card:hover,
+.beta-service-card:focus-visible {
+  border-color: color-mix(in srgb, var(--service-tint, #da1b1b) 58%, #777);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13),
+    0 18px 36px rgba(0, 0, 0, 0.42),
+    0 0 24px color-mix(in srgb, var(--service-tint, #da1b1b) 16%, transparent);
+  transform: translateY(-3px);
+}
+
+/* dulo.mov Top 10 Ranked Hollow Stroke Numbers */
+.top-rank-number {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.72);
+  paint-order: stroke fill;
+  text-shadow: 0 8px 20px rgba(0, 0, 0, 0.62);
+  letter-spacing: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "SF Pro Display", "Segoe UI", sans-serif;
+  font-weight: 850;
+  line-height: 0.82;
+  transition: color 0.3s, -webkit-text-stroke-color 0.3s, transform 0.3s;
+  -webkit-mask-image: linear-gradient(90deg, #000 36%, transparent);
+  mask-image: linear-gradient(90deg, #000 36%, transparent);
+  user-select: none;
+}
+
+.home-rail-ranked [data-rail-card]:hover .top-rank-number,
+.home-rail-ranked [data-rail-card]:focus-visible .top-rank-number {
+  color: #ebebeb;
+  -webkit-text-stroke-color: #ebebeb;
+  transform: translateX(-6px) scale(1.04);
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* dulo.mov Panels & Search Field */
+.beta-panel {
+  border: 1px solid var(--beta-border);
+  background: var(--beta-surface);
+  border-radius: 18px;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.04),
+    0 5px 14px rgba(0, 0, 0, 0.25);
+}
+
+.beta-search-field {
+  border: 1px solid var(--beta-border-strong);
+  background: var(--beta-surface);
+  border-radius: 19px;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.04),
+    0 8px 26px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.beta-search-field:focus-within {
+  border-color: var(--beta-focus);
+  box-shadow: 0 0 0 3px rgba(218, 27, 27, 0.16);
+}
+
+.scrollbar-hide,
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(218, 27, 27, 0.55);
+}
