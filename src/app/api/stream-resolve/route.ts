@@ -12,6 +12,8 @@ export interface ResolvedStreamOption {
   url: string;
   latencyMs: number;
   qualityTag: string;
+  /** "hls" = play natively with hls.js; "embed" = load in an iframe. */
+  kind?: "hls" | "embed";
 }
 
 export interface EngineReport {
@@ -397,6 +399,48 @@ export async function GET(req: NextRequest) {
   const isAnime = typeParam === "anime" || catalogMatch?.type === "anime";
   const useAnimeEngines = isAnime && Number.isFinite(anilistId) && anilistId > 0;
 
+  /**
+   * Cobalt first — this is the resolver dulo.mov's own player ("Cobalt") uses.
+   * It hands back a signed master.m3u8 (4K/1080p/720p/480p) that we play
+   * natively, which is also the only way to get real quality/audio menus.
+   * If the upstream queue is busy or refuses us we fall straight through to
+   * the embed engines, so this can never make playback worse.
+   */
+  const origin = req.nextUrl.origin;
+  let cobaltOption: ResolvedStreamOption | null = null;
+  try {
+    const cq = new URLSearchParams({
+      tmdbId,
+      type: isEpisodic ? "tv" : "movie",
+      season: String(season),
+      episode: String(episode),
+      budget: String(isEpisodic ? 7000 : 5000),
+    });
+    const cobaltRes = await fetch(`${origin}/api/cobalt?${cq.toString()}`, {
+      signal: AbortSignal.timeout(12_000),
+      cache: "no-store",
+    });
+    if (cobaltRes.ok) {
+      const cobalt = (await cobaltRes.json()) as {
+        ready?: boolean;
+        url?: string;
+      };
+      if (cobalt.ready && cobalt.url) {
+        cobaltOption = {
+          id: "cobalt-hls",
+          provider: "Cobalt",
+          label: "Cobalt 4K HLS",
+          url: cobalt.url,
+          latencyMs: 900,
+          qualityTag: "Cobalt · 4K/1080p/720p Native HLS",
+          kind: "hls",
+        };
+      }
+    }
+  } catch {
+    // Cobalt unavailable — embeds below still work.
+  }
+
   const candidates = STREAM_ENGINES.filter((engine) => {
     if (useAnimeEngines && engine.anime) return true;
     return isEpisodic ? Boolean(engine.tv) : Boolean(engine.movie);
@@ -485,7 +529,14 @@ export async function GET(req: NextRequest) {
         ]
       : fallbackOrdered;
 
-  const finalOrdered = animeFirst(ordered);
+  const withKinds = animeFirst(ordered).map((s) => ({
+    ...s,
+    kind: s.kind ?? ("embed" as const),
+  }));
+
+  const finalOrdered: ResolvedStreamOption[] = cobaltOption
+    ? [cobaltOption, ...withKinds.filter((s) => s.id !== "cobalt-hls")]
+    : withKinds;
 
   const engines: EngineReport[] = probed
     .map((p, idx) => ({

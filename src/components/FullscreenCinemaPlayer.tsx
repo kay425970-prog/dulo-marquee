@@ -5,6 +5,7 @@ import { CatalogItem } from "@/lib/catalog";
 import type { ResolvedStreamOption } from "@/app/api/stream-resolve/route";
 import { TvPicker } from "./TvPicker";
 import { SubtitleOverlay } from "./SubtitleOverlay";
+import { HlsVideoPlayer } from "./HlsVideoPlayer";
 import {
   ArrowLeft,
   Maximize2,
@@ -96,6 +97,7 @@ export function FullscreenCinemaPlayer({
   const [subtitleLoading, setSubtitleLoading] = useState(false);
   const [subtitleNotice, setSubtitleNotice] = useState<string | null>(null);
   const [subOffset, setSubOffset] = useState(0);
+  const savedSeconds = 0;
 
   useEffect(() => {
     setStreamIndex(0);
@@ -691,7 +693,8 @@ export function FullscreenCinemaPlayer({
 
       {/* FULLSCREEN STREAMING IFRAME STAGE */}
       <div className="relative flex h-full w-full flex-1 items-center justify-center overflow-hidden bg-black">
-        {(resolvingStreams && !activeStream) || !iframeLoaded ? (
+        {(resolvingStreams && !activeStream) ||
+        (activeStream?.kind !== "hls" && !iframeLoaded) ? (
           <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]/90 px-6 text-center">
             {!loadTimedOut ? (
               <>
@@ -740,7 +743,28 @@ export function FullscreenCinemaPlayer({
           </div>
         ) : null}
 
-        {activeStream && (
+        {activeStream?.kind === "hls" && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <div className="h-full w-full">
+              <HlsVideoPlayer
+                src={activeStream.url}
+                poster={item.backdropUrl || item.posterUrl}
+                title={item.title}
+                subtitle={`${activeStream.provider} · ${activeStream.qualityTag}`}
+                autoPlay
+                initialSeconds={savedSeconds}
+                onProgress={onProgress}
+                subtitleTracks={subtitleTracks}
+                activeSubtitleLang={prefs.subtitleLang}
+                fitMode={prefs.fitMode}
+                subtitleSize={prefs.subtitleSize}
+                subtitleBg={prefs.subtitleBg}
+              />
+            </div>
+          </div>
+        )}
+
+        {activeStream && activeStream.kind !== "hls" && (
           <iframe
             key={`${activeStream.id}-${activeStream.url}`}
             src={embedUrl || activeStream.url}
@@ -765,7 +789,7 @@ export function FullscreenCinemaPlayer({
 
         {/* Subtitles rendered as a DOM overlay so captions work on top of
             third-party embeds too (we cannot inject <track> into them). */}
-        {activeStream && prefs.subtitleLang !== "off" && subtitleTracks[0] && (
+        {activeStream && activeStream.kind !== "hls" && prefs.subtitleLang !== "off" && subtitleTracks[0] && (
           <SubtitleOverlay
             vttUrl={subtitleTracks[0].url}
             currentTime={embedClock}
