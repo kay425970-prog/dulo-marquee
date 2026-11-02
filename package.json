@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@netlify/plugin-nextjs": "^5.16.5",
     "dotenv": "17.3.1",
     "drizzle-orm": "0.45.2",
     "hls.js": "^1.7.4",

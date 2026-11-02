@@ -1,0 +1,36 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Netlify's Next.js runtime handles App Router SSR, API routes, ISR and
+# image optimisation. Without this plugin the /api/* routes will 404.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Never let the build fail because a database hasn't been attached yet.
+# The app degrades gracefully: browsing/TMDB/VidCore still work, and auth,
+# My List and Watch Parties return a clear "database not configured" message
+# until DATABASE_URL is provided in Site settings → Environment variables.
+[build.environment.production]
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Hashed build assets are immutable.
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Icons and manifest can be cached aggressively but must stay revalidatable.
+[[headers]]
+  for = "/favicon.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
