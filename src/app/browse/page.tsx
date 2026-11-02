@@ -269,7 +269,7 @@ export function DuloShelfBrowser({
                 {titleHeading}
               </h1>
               <p className="mt-1 text-xs font-medium text-white/50">
-                {filteredItems.length} titles · TMDB Posters · VidLink 4K
+                {filteredItems.length} titles · TMDB Posters · VidBolt HD
                 Priority
               </p>
             </div>

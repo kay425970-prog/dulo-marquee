@@ -86,7 +86,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
     "none"
   );
 
-  // Automatic background stream resolution (VidLink first)
+  // Automatic background stream resolution (VidBolt first)
   const [resolvedStreams, setResolvedStreams] = useState<
     ResolvedStreamOption[]
   >([]);
@@ -172,7 +172,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
     }
   };
 
-  // Pre-resolve the top engine (VidLink) automatically in background
+  // Pre-resolve the top engine (VidBolt) automatically in background
   useEffect(() => {
     if (!item) return;
     let cancelled = false;
@@ -287,7 +287,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
       const data = await res.json();
       setActiveParty(data.party);
       setPlayerOpen(true);
-      notify(`Watch Party ${data.party.roomCode} started on VidLink!`);
+      notify(`Watch Party ${data.party.roomCode} started on VidBolt!`);
     }
   }, [item, activeProfile, season, episode, notify]);
 
@@ -463,7 +463,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
 
   return (
     <div className="min-h-screen pb-20">
-      {/* FULL-SCREEN PLAYER (Launches on Play or Episode click, prioritized to VidLink) */}
+      {/* FULL-SCREEN PLAYER (Launches on Play or Episode click, prioritized to VidBolt) */}
       <FullscreenCinemaPlayer
         open={playerOpen}
         onClose={() => setPlayerOpen(false)}
@@ -560,8 +560,8 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
               <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300 ring-1 ring-emerald-400/25">
                 <CheckCircle2 className="h-3 w-3" />
                 {resolvingStreams
-                  ? "Routing VidLink…"
-                  : primaryStream?.qualityTag || "VidLink 4K"}
+                  ? "Routing VidBolt…"
+                  : primaryStream?.qualityTag || "VidBolt HD"}
               </span>
               {!resolvingStreams && engineCount > 1 && (
                 <span className="inline-flex items-center gap-1 rounded-md bg-white/[0.08] px-2 py-0.5 text-[11px] font-semibold text-white/70">

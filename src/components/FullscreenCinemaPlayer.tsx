@@ -436,7 +436,7 @@ export function FullscreenCinemaPlayer({
                 <CheckCircle2 className="h-3 w-3" />
                 {activeStream
                   ? `${manualStream ? "Manual API" : "Auto-Connected"} · ${activeStream.qualityTag}`
-                  : "Connecting VidLink 4K..."}
+                  : "Connecting VidBolt HD..."}
               </span>
               {subtitleTracks.length > 0 && prefs.subtitleLang !== "off" && (
                 <span className="rounded-md bg-emerald-500/15 px-1.5 py-0.5 font-semibold text-emerald-300 ring-1 ring-emerald-400/25">
@@ -550,7 +550,7 @@ export function FullscreenCinemaPlayer({
               className="max-w-[148px] cursor-pointer bg-transparent text-xs font-semibold text-white outline-none sm:max-w-[210px]"
             >
               <option value="auto" className="bg-[#171717] text-white">
-                Auto · Best ({streams[0]?.provider || "VidLink"})
+                Auto · Best ({streams[0]?.provider || "VidBolt"})
               </option>
               {streams.map((stream, idx) => {
                 let host = stream.provider;
@@ -667,7 +667,7 @@ export function FullscreenCinemaPlayer({
               <>
                 <Loader2 className="h-10 w-10 animate-spin text-[#da1b1b]" />
                 <p className="text-xs font-semibold text-white/85">
-                  Launching {item.title} on {activeStream?.provider || "VidLink"}...
+                  Launching {item.title} on {activeStream?.provider || "VidBolt"}...
                 </p>
               </>
             ) : (

@@ -47,7 +47,7 @@ const STAGES: Array<{
   { id: "scouting", label: "1. Scouting" },
   { id: "negotiation", label: "2. Negotiation" },
   { id: "encoding", label: "3. 4K Encoding" },
-  { id: "live", label: "4. Live on VidLink" },
+  { id: "live", label: "4. Live on VidBolt" },
 ];
 
 export default function CrmPage() {
@@ -154,7 +154,7 @@ export default function CrmPage() {
             <div>
               <h1 className="text-lg font-bold text-white">CRM Admin Login</h1>
               <p className="text-xs text-white/50">
-                VidLink &amp; TMDB Catalog Operations
+                VidBolt &amp; TMDB Catalog Operations
               </p>
             </div>
           </div>
@@ -219,7 +219,7 @@ export default function CrmPage() {
             Content Aggregator CRM &amp; Telemetry
           </h1>
           <p className="text-xs text-white/55">
-            Live PostgreSQL pipeline for TMDB catalog sync, VidLink 4K routing
+            Live PostgreSQL pipeline for TMDB catalog sync, VidBolt HD routing
             &amp; viewer engagement.
           </p>
         </div>
