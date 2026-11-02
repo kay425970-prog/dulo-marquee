@@ -1,6 +1,16 @@
 appId: app.dulo.marquee
 productName: dulo
-copyright: dulo
+copyright: Copyright © 2026 dulo
+
+# The web app's package.json is private and version-less (it runs on Netlify),
+# so inject the desktop metadata here rather than mutating it.
+extraMetadata:
+  version: 1.0.0
+  description: "dulo — watch movies, shows, anime and live TV"
+  author:
+    name: dulo
+    email: kay425970@gmail.com
+  main: electron/main.cjs
 
 directories:
   output: dist
