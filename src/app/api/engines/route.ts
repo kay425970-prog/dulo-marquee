@@ -22,6 +22,7 @@ export async function GET() {
       supportsMovies: Boolean(e.movie),
       supportsSeries: Boolean(e.tv),
       qualityTag: e.qualityTag,
+      allowUnverified: Boolean(e.allowUnverified),
       movieTemplate: e.movie ? e.movie("{tmdb_id}") : null,
       tvTemplate: e.tv ? e.tv("{tmdb_id}", 1, 1) : null,
     })).sort((a, b) => a.tier - b.tier),

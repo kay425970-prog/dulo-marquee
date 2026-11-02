@@ -51,6 +51,8 @@ interface EngineDef {
   tier: number;
   timeoutMs: number;
   qualityTag: string;
+  /** Keep engine in the failover list even when server-side DNS/egress can't reach it (browser may still resolve it). */
+  allowUnverified?: boolean;
   movie?: (tmdbId: string) => string;
   tv?: (tmdbId: string, season: number, episode: number) => string;
 }
@@ -75,11 +77,25 @@ export const STREAM_ENGINES: EngineDef[] = [
       `https://vidcore.org/embed/tv/${id}/${s}/${e}?autoplay=true&theme=da1b1b`,
   },
   {
+    id: "vidking",
+    provider: "VidKing",
+    label: "VidKing 4K",
+    host: "www.vidking.net",
+    tier: 2,
+    timeoutMs: 4200,
+    qualityTag: "VidKing · 4K Multi-Episode Selector",
+    allowUnverified: true,
+    movie: (id) =>
+      `https://www.vidking.net/embed/movie/${id}?color=e50914&autoPlay=true`,
+    tv: (id, s, e) =>
+      `https://www.vidking.net/embed/tv/${id}/${s}/${e}?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`,
+  },
+  {
     id: "vidlink",
     provider: "VidLink",
     label: "VidLink 4K",
     host: "vidlink.pro",
-    tier: 2,
+    tier: 3,
     timeoutMs: 4400,
     qualityTag: "VidLink · 4K Multi-Audio",
     movie: (id) =>
@@ -92,7 +108,7 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "Videasy",
     label: "Videasy Ultra",
     host: "player.videasy.to",
-    tier: 3,
+    tier: 4,
     timeoutMs: 4400,
     qualityTag: "Videasy · 1080p/4K Ultra",
     movie: (id) => `https://player.videasy.to/movie/${id}?color=DA1B1B`,
@@ -104,7 +120,7 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "VidFast",
     label: "VidFast Rapid",
     host: "vidfast.vc",
-    tier: 4,
+    tier: 5,
     timeoutMs: 4400,
     qualityTag: "VidFast · Rapid 1080p",
     movie: (id) => `https://vidfast.vc/movie/${id}?autoPlay=true`,
@@ -115,7 +131,7 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "VidCore",
     label: "VidCore Mirror",
     host: "vidcore.io",
-    tier: 5,
+    tier: 6,
     timeoutMs: 4600,
     qualityTag: "VidCore Mirror · 1080p",
     movie: (id) => `https://vidcore.io/embed/movie/${id}?autoplay=true`,
@@ -126,7 +142,7 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "VidBolt",
     label: "VidBolt HD",
     host: "vidbolt.pro",
-    tier: 6,
+    tier: 7,
     timeoutMs: 3800,
     qualityTag: "VidBolt · HD Multi-Sub",
     movie: (id) => `https://vidbolt.pro/embed/movie/${id}`,
@@ -137,7 +153,7 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "CineSrc",
     label: "CineSrc Cinema",
     host: "cinesrc.st",
-    tier: 7,
+    tier: 8,
     timeoutMs: 3800,
     qualityTag: "CineSrc · Cinema HD",
     movie: (id) => `https://cinesrc.st/embed/movie/${id}?autoplay=1`,
@@ -148,7 +164,7 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "2Embed",
     label: "2Embed Cloud",
     host: "www.2embed.cc",
-    tier: 8,
+    tier: 9,
     timeoutMs: 3800,
     qualityTag: "2Embed · HD Cloud",
     movie: (id) => `https://www.2embed.cc/embed/${id}`,
@@ -159,7 +175,7 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "VidSpark",
     label: "VidSpark Relay",
     host: "vidspark.to",
-    tier: 9,
+    tier: 10,
     timeoutMs: 3800,
     qualityTag: "VidSpark · HD Relay",
     movie: (id) => `https://vidspark.to/movie/${id}`,
@@ -367,19 +383,49 @@ export async function GET(req: NextRequest) {
     })
     .map((p) => p.option as ResolvedStreamOption);
 
-  // If probing produced nothing healthy (cold cache + flaky egress), fall back
-  // to the full tier-ordered candidate list so playback still attempts in order.
+  // Engines the sandbox/server cannot reach (e.g. DNS-blocked VidKing) are kept
+  // as unverified backups so the browser can still attempt them, then the
+  // fullscreen watchdog auto-fails over to the next verified engine.
+  const unverified = candidates
+    .filter((c, idx) => {
+      const p = probed[idx];
+      return (
+        c.engine.allowUnverified &&
+        !p.report.healthy &&
+        (p.report.blockedReason === "timeout-or-dns" ||
+          p.report.blockedReason === "unreachable")
+      );
+    })
+    .map(({ engine, url }) => ({
+      id: engine.id,
+      provider: engine.provider,
+      label: engine.label,
+      url,
+      latencyMs: 6000,
+      qualityTag: engine.qualityTag + " · browser fallback",
+    }));
+
+  const fallbackOrdered = candidates.map(({ engine, url }) => ({
+    id: engine.id,
+    provider: engine.provider,
+    label: engine.label,
+    url,
+    latencyMs: engine.tier * 40,
+    qualityTag: engine.qualityTag,
+  }));
+
   const ordered: ResolvedStreamOption[] =
     healthy.length > 0
-      ? healthy
-      : candidates.map(({ engine, url }) => ({
-          id: engine.id,
-          provider: engine.provider,
-          label: engine.label,
-          url,
-          latencyMs: engine.tier * 40,
-          qualityTag: engine.qualityTag,
-        }));
+      ? [
+          ...healthy,
+          ...unverified,
+          ...fallbackOrdered.filter(
+            (f) =>
+              !healthy.some((h) => h.id === f.id) &&
+              !unverified.some((u) => u.id === f.id)
+          ),
+        ]
+      : fallbackOrdered;
 
   const engines: EngineReport[] = probed
     .map((p, idx) => ({
