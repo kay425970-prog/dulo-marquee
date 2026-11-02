@@ -7,6 +7,7 @@ import { useMarquee } from "./MarqueeProvider";
 import {
   Search,
   Home,
+  Compass,
   User,
   Radio,
   Film,
@@ -119,11 +120,11 @@ export function Navbar() {
       active: pathname === "/",
     },
     {
-      key: "you",
-      label: "Your Arkaflix",
-      href: "/my",
-      icon: User,
-      active: pathname === "/my",
+      key: "discover",
+      label: "Discover",
+      href: "/browse",
+      icon: Compass,
+      active: pathname === "/browse",
     },
     {
       key: "live",
@@ -163,11 +164,18 @@ export function Navbar() {
         pathname.startsWith("/title/anime"),
     },
     {
-      key: "library",
-      label: "Library",
+      key: "providers",
+      label: "Providers",
       href: "/providers",
       icon: Layers,
       active: pathname.startsWith("/providers"),
+    },
+    {
+      key: "mylist",
+      label: "My List",
+      href: "/my",
+      icon: Bookmark,
+      active: pathname === "/my",
     },
     {
       key: "watchparties",
@@ -405,13 +413,7 @@ export function Navbar() {
                   }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
-                  <span
-                    className={`truncate ${
-                      item.key === "watchparties" ? "hidden 2xl:inline" : ""
-                    }`}
-                  >
-                    {item.label}
-                  </span>
+                  <span className="truncate">{item.label}</span>
                 </Link>
               );
             })}

@@ -281,52 +281,105 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div data-tv-rail className="scrollbar-hide arkaflix-rail-px flex gap-4 overflow-x-auto pb-4 pt-1">
-              {continueWatching.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="group relative w-[240px] shrink-0 sm:w-[272px]"
-                >
-                  <Link
-                    href={`/title/${entry.mediaType}/${entry.mediaId}`}
-                    className="block"
-                  >
-                    <div className="relative aspect-video overflow-hidden rounded-[14px] bg-white/[0.05] shadow-[0_10px_28px_rgba(0,0,0,0.3)] ring-1 ring-white/[0.07] transition duration-300 group-hover:scale-[1.02] group-hover:ring-white/[0.45]">
-                      <img
-                        src={entry.backdropUrl || entry.posterUrl}
-                        alt={entry.title}
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2">
-                        <span className="truncate text-[13px] font-semibold text-white">
-                          {entry.title}
-                        </span>
-                        <span className="shrink-0 text-[11px] font-semibold text-white/70">
-                          {entry.mediaType === "movie"
-                            ? `${entry.progressPercent}%`
-                            : `S${entry.lastSeason} · E${entry.lastEpisode}`}
-                        </span>
-                      </div>
-                      <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20">
-                        <div
-                          className="h-full bg-[#da1b1b]"
-                          style={{ width: `${entry.progressPercent}%` }}
-                        />
+            <div data-tv-rail className="scrollbar-hide arkaflix-rail-px flex gap-5 overflow-x-auto pb-4 pt-1">
+              {continueWatching.map((entry) => {
+                const catalog = findCatalogItem(entry.mediaId, entry.mediaType);
+                const isSeries = entry.mediaType !== "movie";
+                const left = Math.max(
+                  1,
+                  Math.round((100 - entry.progressPercent) * 0.24)
+                );
+                return (
+                  <div key={entry.id} className="group relative shrink-0">
+                    <div className="flex items-stretch gap-3">
+                      {/* landscape thumb with Enter/Open chip */}
+                      <Link
+                        href={`/title/${entry.mediaType}/${entry.mediaId}`}
+                        className="relative block w-[286px] shrink-0 overflow-hidden rounded-[10px] ring-1 ring-white/[0.12] transition group-hover:ring-white/70"
+                      >
+                        <div className="relative aspect-video bg-white/[0.05]">
+                          <img
+                            src={entry.backdropUrl || entry.posterUrl}
+                            alt={entry.title}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
+                          <span className="absolute right-2 top-2 inline-flex items-center gap-1.5 rounded-full bg-black/75 py-1 pl-1 pr-2.5 backdrop-blur">
+                            <kbd className="grid h-4 min-w-5 place-items-center rounded border border-white/40 px-1 text-[9px] font-bold text-white/85">
+                              Enter
+                            </kbd>
+                            <span className="text-[11px] font-semibold text-white">
+                              Open
+                            </span>
+                          </span>
+                          <span className="absolute inset-x-0 bottom-0 h-[3px] bg-white/25">
+                            <span
+                              className="block h-full bg-[#e02020]"
+                              style={{ width: `${entry.progressPercent}%` }}
+                            />
+                          </span>
+                        </div>
+                      </Link>
+
+                      {/* info card, revealed on hover/focus like dulo */}
+                      <div className="w-0 overflow-hidden transition-all duration-200 group-hover:w-[300px] group-focus-within:w-[300px]">
+                        <div className="flex h-full w-[300px] flex-col justify-between rounded-[10px] border border-white/[0.1] bg-[#17171b] p-4">
+                          <div>
+                            <h3 className="text-[17px] font-bold leading-tight text-white">
+                              {entry.title}
+                            </h3>
+                            <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 text-[11.5px] text-white/55">
+                              <span className="rounded border border-white/30 px-1 py-px text-[9px] font-bold uppercase">
+                                {catalog?.quality === "4K" ? "4K" : "HD"}
+                              </span>
+                              <span>{isSeries ? "Series" : "Film"}</span>
+                              {isSeries && (
+                                <span>
+                                  {catalog?.seasons?.length
+                                    ? `${catalog.seasons.length} Season${catalog.seasons.length > 1 ? "s" : ""}`
+                                    : "1 Season"}
+                                </span>
+                              )}
+                            </div>
+                            <div className="mt-2.5 h-[3px] w-full rounded-full bg-white/15">
+                              <div
+                                className="h-full rounded-full bg-[#e02020]"
+                                style={{ width: `${entry.progressPercent}%` }}
+                              />
+                            </div>
+                            <p className="mt-2 text-[11.5px] font-medium text-white/60">
+                              {isSeries
+                                ? `S${entry.lastSeason} E${entry.lastEpisode} · ${left} min left`
+                                : `${left} min left`}
+                            </p>
+                            {catalog && catalog.cast.length > 0 && (
+                              <p className="mt-1.5 line-clamp-1 text-[11px] text-white/40">
+                                Starring{" "}
+                                {catalog.cast.slice(0, 3).map((c) => c.name).join(", ")}
+                              </p>
+                            )}
+                          </div>
+                          <div className="mt-3 flex gap-2">
+                            <Link
+                              href={`/title/${entry.mediaType}/${entry.mediaId}?play=1`}
+                              className="flex-1 rounded-lg bg-white py-1.5 text-center text-[11px] font-bold text-black"
+                            >
+                              Resume
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => clearProgress(entry.mediaId)}
+                              className="rounded-lg bg-white/[0.1] px-2.5 py-1.5 text-[11px] font-bold text-white/70 hover:bg-white/[0.18] hover:text-white"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => clearProgress(entry.mediaId)}
-                    aria-label="Remove from Continue Watching"
-                    className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-black/70 text-white/75 opacity-0 backdrop-blur transition hover:bg-[#da1b1b] hover:text-white group-hover:opacity-100"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
