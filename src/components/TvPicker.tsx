@@ -22,6 +22,10 @@ interface TvPickerProps {
   title?: string;
   badge?: string | number;
   onInteract?: () => void;
+  /** Where the panel opens. "left" is for a right-hand vertical rail. */
+  placement?: "bottom" | "left";
+  /** Stretch the trigger to fill its container (vertical rail). */
+  fullWidth?: boolean;
 }
 
 const PANEL_WIDTH = 240;
@@ -48,6 +52,8 @@ export function TvPicker({
   title,
   badge,
   onInteract,
+  placement = "bottom",
+  fullWidth = false,
 }: TvPickerProps) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ left: number; top: number; maxHeight: number } | null>(null);
@@ -65,6 +71,16 @@ export function TvPicker({
     const r = trigger.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
+
+    if (placement === "left") {
+      // Open to the left of the trigger (right-hand rail), top-aligned.
+      let left = r.left - PANEL_WIDTH - 10;
+      if (left < EDGE) left = EDGE;
+      const top = Math.max(EDGE, Math.min(r.top, vh - 260));
+      const maxHeight = Math.max(180, Math.min(vh - top - EDGE, vh * 0.7));
+      setPos({ left, top, maxHeight });
+      return;
+    }
 
     // Prefer left-aligned with the trigger, then clamp into the viewport.
     let left = r.left;
@@ -84,7 +100,7 @@ export function TvPicker({
   useLayoutEffect(() => {
     if (!open) return;
     place();
-  }, [open, place]);
+  }, [open, place, placement]);
 
   // Keep it anchored while the HUD moves / the window resizes.
   useEffect(() => {
@@ -96,7 +112,7 @@ export function TvPicker({
       window.removeEventListener("resize", onScroll);
       window.removeEventListener("scroll", onScroll, true);
     };
-  }, [open, place]);
+  }, [open, place, placement]);
 
   // Close on outside click / Escape.
   useEffect(() => {
@@ -212,7 +228,9 @@ export function TvPicker({
           setOpen((v) => !v);
           onInteract?.();
         }}
-        className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 backdrop-blur-2xl transition ${
+        className={`h-10 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 backdrop-blur-2xl transition ${
+          fullWidth ? "flex w-full justify-between" : "inline-flex"
+        } ${
           warn
             ? "bg-amber-500/20 text-amber-100 ring-amber-400/40"
             : active

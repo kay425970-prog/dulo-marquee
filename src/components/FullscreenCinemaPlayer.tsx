@@ -467,10 +467,23 @@ export function FullscreenCinemaPlayer({
           </div>
         </div>
 
-        {/* Right: API Selector + Episode Switcher + Watch Party + Native Fullscreen */}
-        <div className="flex items-center gap-2">
+      </div>
+
+
+      {/* RIGHT-SIDE VERTICAL CONTROL RAIL */}
+      <div
+        className={`hide-scrollbar absolute right-2 top-1/2 z-30 flex w-[11.5rem] max-w-[calc(100vw-1rem)] -translate-y-1/2 flex-col items-stretch gap-2 overflow-y-auto py-2 pr-1 transition-opacity duration-300 sm:right-4 sm:w-[13.25rem] ${
+          hudVisible || episodesDrawerOpen || partyDrawerOpen
+            ? "opacity-100"
+            : "pointer-events-none opacity-0"
+        }`}
+        style={{ maxHeight: "88dvh" }}
+      >
+        <div className="pointer-events-none absolute inset-y-0 -right-1 -left-2 -z-10 rounded-l-3xl bg-gradient-to-l from-black/55 to-transparent" />
           {/* Universal subtitle engine — remote-friendly picker, not a <select> */}
           <TvPicker
+            placement="left"
+            fullWidth
             icon={<Captions className="h-3.5 w-3.5" />}
             label={prefs.subtitleLang === "off" ? "CC Off" : "Subtitles"}
             value={prefs.subtitleLang}
@@ -492,7 +505,7 @@ export function FullscreenCinemaPlayer({
 
           {/* Subtitle timing nudge — fixes drift on embeds */}
           {prefs.subtitleLang !== "off" && subtitleTracks.length > 0 && (
-            <div className="hidden h-10 items-center gap-1 rounded-full bg-[#0d0d0d]/80 px-2 ring-1 ring-white/[0.1] backdrop-blur-2xl sm:flex">
+            <div className="flex h-10 items-center justify-between gap-1 rounded-full bg-[#0d0d0d]/80 px-2 ring-1 ring-white/[0.1] backdrop-blur-2xl">
               <button
                 type="button"
                 onClick={() => setSubOffset((v) => Math.round((v - 0.5) * 10) / 10)}
@@ -537,7 +550,7 @@ export function FullscreenCinemaPlayer({
             }`}
           >
             <Scan className="h-3.5 w-3.5" />
-            <span className="hidden lg:inline">
+            <span>
               {prefs.fitMode === "cover" ? "Fill" : "Fit"}
             </span>
           </button>
@@ -600,7 +613,7 @@ export function FullscreenCinemaPlayer({
                 className="inline-flex h-10 items-center gap-1 rounded-full bg-[#0d0d0d]/80 px-3.5 text-xs font-semibold text-white ring-1 ring-white/[0.1] backdrop-blur-2xl transition hover:bg-white/[0.14] disabled:opacity-35"
               >
                 <SkipBack className="h-3.5 w-3.5" />
-                <span className="hidden md:inline">Prev</span>
+                <span>Prev</span>
               </button>
               <button
                 type="button"
@@ -609,7 +622,7 @@ export function FullscreenCinemaPlayer({
                 title="Next Episode"
                 className="inline-flex h-10 items-center gap-1 rounded-full bg-[#0d0d0d]/80 px-3.5 text-xs font-semibold text-white ring-1 ring-white/[0.1] backdrop-blur-2xl transition hover:bg-white/[0.14] disabled:opacity-35"
               >
-                <span className="hidden md:inline">Next</span>
+                <span>Next</span>
                 <SkipForward className="h-3.5 w-3.5" />
               </button>
               <button
@@ -625,7 +638,7 @@ export function FullscreenCinemaPlayer({
                 }`}
               >
                 <ListVideo className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Episodes</span>
+                <span>Episodes</span>
               </button>
             </>
           )}
@@ -648,7 +661,7 @@ export function FullscreenCinemaPlayer({
             }`}
           >
             <Users className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">
+            <span>
               {activeParty ? `Party ${activeParty.roomCode}` : "Watch Party"}
             </span>
           </button>
@@ -674,7 +687,6 @@ export function FullscreenCinemaPlayer({
           >
             <X className="h-4 w-4" />
           </button>
-        </div>
       </div>
 
       {/* FULLSCREEN STREAMING IFRAME STAGE */}
