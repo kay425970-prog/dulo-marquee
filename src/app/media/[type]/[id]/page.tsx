@@ -59,8 +59,10 @@ export function ArkaflixTitleInfoView({ type, id }: { type: string; id: string }
     activeProfile,
     collections,
     isInWatchlist,
+    isFavorite,
     getProgress,
     toggleWatchlist,
+    toggleFavorite,
     saveProgress,
     clearProgress,
     refreshState,
@@ -419,6 +421,13 @@ export function ArkaflixTitleInfoView({ type, id }: { type: string; id: string }
   }
 
   const inWatchlist = isInWatchlist(item.id);
+  const isFav = isFavorite(item.id);
+  const openTrailer = useCallback((entry: CatalogItem) => {
+    const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(
+      `${entry.title} ${entry.year} official trailer`
+    )}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  }, []);
   const isEpisodic =
     item.tmdbMediaType === "tv" ||
     Boolean(item.seasons && item.seasons.length > 0);
@@ -514,14 +523,17 @@ export function ArkaflixTitleInfoView({ type, id }: { type: string; id: string }
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_72%_52%_at_52%_-8%,rgba(255,193,106,0.18),transparent_58%)]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/25 to-transparent" />
 
-        {/* Floating Back Pill */}
+        {/* "Back to browse" chip with key hint (dulo style) */}
         <button
           type="button"
           onClick={() => router.back()}
-          aria-label="Back"
-          className="absolute left-5 top-20 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#0d0d0d]/65 text-white/85 ring-1 ring-white/[0.1] backdrop-blur-2xl transition hover:bg-white/[0.15] sm:left-8 lg:top-24"
+          aria-label="Back to browse"
+          className="absolute left-5 top-20 z-20 inline-flex items-center gap-2 rounded-full px-1 py-1 text-[13px] font-semibold text-white/75 transition hover:text-white sm:left-8 lg:top-24"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <kbd className="grid h-6 min-w-8 place-items-center rounded-md border border-white/30 bg-white/[0.06] px-1.5 text-[10px] font-bold">
+            Bs
+          </kbd>
+          <span>Back to browse</span>
         </button>
 
         {/* Hero Foreground Content */}
@@ -585,40 +597,62 @@ export function ArkaflixTitleInfoView({ type, id }: { type: string; id: string }
               </p>
             )}
 
-            {/* ARKAFLIX.MOV ACTION BAR: PLAY OPENS FULLSCREEN PLAYER */}
+            {/* Action bar with dulo key hints */}
             <div className="mt-6 flex flex-wrap items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => launchFullscreenPlayer()}
-                className="beta-action inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-7 text-sm font-semibold text-[#111111] transition hover:bg-white/90 sm:text-[15px]"
+                className="inline-flex h-[52px] items-center gap-2.5 rounded-xl bg-white pl-3.5 pr-6 text-[15px] font-bold text-black transition hover:bg-white/90"
               >
-                <Play className="h-4 w-4 fill-current" />
-                <span>
-                  {isEpisodic
-                    ? savedEntry && savedEntry.progressPercent > 0
-                      ? `Resume S${season} · E${episode}`
-                      : `Play S${season} · E${episode}`
-                    : savedEntry && savedEntry.progressPercent > 0
-                      ? `Resume (${savedEntry.progressPercent}%)`
-                      : "Play"}
-                </span>
+                <kbd className="grid h-6 min-w-6 place-items-center rounded-full border border-black/30 px-1.5 text-[10px] font-bold text-black/70">
+                  P
+                </kbd>
+                <span>Play</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => toggleWatchlist(item)}
-                className={`beta-action inline-flex h-12 items-center gap-2 rounded-full px-5 text-sm font-semibold backdrop-blur-xl transition ${
+                className={`inline-flex h-[52px] items-center gap-2.5 rounded-xl pl-3.5 pr-6 text-[15px] font-bold backdrop-blur transition ${
                   inWatchlist
-                    ? "bg-[#da1b1b]/25 text-white ring-1 ring-[#da1b1b]/60"
-                    : "bg-white/[0.12] text-white hover:bg-white/[0.2]"
+                    ? "bg-[#e02020]/30 text-white ring-1 ring-[#e02020]/70"
+                    : "bg-white/[0.12] text-white ring-1 ring-white/[0.1] hover:bg-white/[0.2]"
                 }`}
               >
-                {inWatchlist ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <Plus className="h-4 w-4" />
-                )}
+                <kbd className="grid h-6 min-w-6 place-items-center rounded-full border border-white/35 px-1.5 text-[10px] font-bold text-white/80">
+                  F
+                </kbd>
                 <span>{inWatchlist ? "In My List" : "My List"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleFavorite(item)}
+                className={`inline-flex h-[52px] items-center gap-2.5 rounded-xl pl-3.5 pr-6 text-[15px] font-bold backdrop-blur transition ${
+                  isFav
+                    ? "bg-white text-black"
+                    : "bg-white/[0.12] text-white ring-1 ring-white/[0.1] hover:bg-white/[0.2]"
+                }`}
+              >
+                <kbd
+                  className={`grid h-6 min-w-6 place-items-center rounded-full border px-1.5 text-[10px] font-bold ${
+                    isFav ? "border-black/30 text-black/70" : "border-white/35 text-white/80"
+                  }`}
+                >
+                  F
+                </kbd>
+                <span>Favorite</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => openTrailer(item)}
+                className="inline-flex h-[52px] items-center gap-2.5 rounded-xl bg-white/[0.12] pl-3.5 pr-6 text-[15px] font-bold text-white ring-1 ring-white/[0.1] backdrop-blur transition hover:bg-white/[0.2]"
+              >
+                <kbd className="grid h-6 min-w-8 place-items-center rounded-md border border-white/35 px-1.5 text-[10px] font-bold text-white/80">
+                  Enter
+                </kbd>
+                <span>Trailer</span>
               </button>
 
               <button

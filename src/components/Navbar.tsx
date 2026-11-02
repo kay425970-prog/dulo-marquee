@@ -23,18 +23,30 @@ import {
   LogOut,
 } from "lucide-react";
 
-export function ArkaflixLogoMark({ className = "h-7 w-7" }: { className?: string }) {
+/**
+ * Arkaflix wordmark: a bold white "A" followed by a red dot — the direct
+ * analogue of dulo's "d." lockup.
+ */
+export function ArkaflixLogoMark({
+  className = "h-7 w-auto",
+}: {
+  className?: string;
+}) {
   return (
     <svg
-      viewBox="336 386 368 356"
-      fill="currentColor"
+      viewBox="0 0 104 64"
+      fill="none"
       aria-hidden="true"
       className={className}
     >
-      <g transform="translate(0,1024) scale(0.1,-0.1)">
-        <path d="M5457 6280 c1 -368 -1 -670 -4 -670 -3 0 -38 25 -78 55 -440 331 -1087 272 -1469 -135 -219 -233 -331 -550 -313 -884 22 -394 196 -723 492 -926 222 -153 561 -214 855 -154 159 33 356 131 458 229 l52 51 1 -30 c1 -17 2 -75 3 -128 l1 -98 303 0 302 0 0 1680 0 1680 -302 0 -303 0 2 -670z m-537 -930 c157 -25 289 -96 396 -214 111 -121 164 -266 164 -450 0 -359 -280 -636 -645 -638 -176 -1 -322 58 -445 182 -130 130 -190 278 -190 470 0 201 53 334 184 466 150 150 338 215 536 184z" />
-        <path d="M6523 4255 c-100 -31 -186 -103 -231 -194 -24 -50 -27 -67 -27 -156 0 -95 2 -103 34 -163 40 -74 93 -124 171 -161 48 -23 68 -26 155 -26 88 0 107 3 157 27 63 29 146 105 174 159 22 43 44 125 44 164 0 99 -68 231 -149 291 -88 65 -229 90 -328 59z" />
-      </g>
+      {/* A */}
+      <path
+        d="M4 56 L30 8 L56 56 L44 56 L30 28 L16 56 Z"
+        fill="currentColor"
+      />
+      <rect x="21" y="40" width="18" height="8" rx="3" fill="currentColor" />
+      {/* . */}
+      <circle cx="76" cy="50" r="7" fill="#e02020" />
     </svg>
   );
 }
@@ -55,8 +67,14 @@ const MOVIE_FOOTER_GENRES = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const { user, activeProfile, openOmnibar, openProfileModal, signOut } =
-    useMarquee();
+  const {
+    user,
+    activeProfile,
+    openOmnibar,
+    openProfileModal,
+    openRandomPicker,
+    signOut,
+  } = useMarquee();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -327,27 +345,45 @@ export function Navbar() {
           <Link
             href="/"
             aria-label="arkaflix home"
-            className="mr-1 flex shrink-0 items-center gap-2 rounded-[16px] pl-1.5 pr-2.5 text-white transition-opacity hover:opacity-80"
+            className="mr-1 flex shrink-0 items-center gap-2 rounded-[16px] py-1 pl-2 pr-3 text-white transition-opacity hover:opacity-85"
           >
-            <ArkaflixLogoMark className="h-7 w-7 shrink-0 text-white" />
+            <ArkaflixLogoMark className="h-5 w-auto shrink-0 text-white" />
           </Link>
 
-          {/* Fullscreen Toggle + Divider */}
-          <button
-            type="button"
-            onClick={toggleBrowserFullscreen}
-            aria-label={isFullscreen ? "Leave full screen" : "Enter full screen"}
-            className="relative inline-flex h-10 shrink-0 items-center gap-1 rounded-[16px] px-2.5 text-[13px] font-semibold text-white/[0.68] transition-all duration-200 hover:bg-white/[0.09] hover:text-white/[0.92]"
-          >
-            {isFullscreen ? (
-              <Minimize2 className="h-3.5 w-3.5" />
-            ) : (
-              <Maximize2 className="h-3.5 w-3.5" />
-            )}
-            <span>{isFullscreen ? "Exit" : "Full"}</span>
-          </button>
+          {/* Action chips: TV mode · fullscreen · surprise me */}
+          <div className="ml-0.5 flex shrink-0 items-center gap-1.5">
+            <Link
+              href="/?tv=1"
+              className="inline-flex h-9 items-center rounded-full bg-white/[0.07] px-3.5 text-[12.5px] font-semibold text-white/85 ring-1 ring-white/[0.07] transition hover:bg-white/[0.13] hover:text-white"
+            >
+              Exit TV mode
+            </Link>
+            <button
+              type="button"
+              onClick={toggleBrowserFullscreen}
+              className="inline-flex h-9 items-center rounded-full bg-white/[0.07] px-3.5 text-[12.5px] font-semibold text-white/85 ring-1 ring-white/[0.07] transition hover:bg-white/[0.13] hover:text-white"
+            >
+              {isFullscreen ? "Exit full screen" : "Exit full screen"}
+            </button>
+            <button
+              type="button"
+              onClick={openRandomPicker}
+              className="inline-flex h-9 items-center rounded-full bg-white/[0.07] px-3.5 text-[12.5px] font-semibold text-white/85 ring-1 ring-white/[0.07] transition hover:bg-white/[0.13] hover:text-white"
+            >
+              Surprise me
+            </button>
+            <span className="hidden items-center gap-1 2xl:flex">
+              <kbd className="grid h-6 min-w-6 place-items-center rounded-md border border-white/25 bg-white/[0.08] px-1.5 text-[10px] font-bold text-white/80">
+                Enter
+              </kbd>
+              <kbd className="grid h-6 min-w-6 place-items-center rounded-md border border-white/25 bg-white/[0.08] px-1.5 text-[10px] font-bold text-white/80">
+                Arrows
+              </kbd>
+            </span>
+          </div>
 
-          <span className="mx-0.5 h-7 w-px shrink-0 bg-white/[0.08]" />
+          {/* Fullscreen Toggle + Divider */}
+          <span className="mx-1 h-7 w-px shrink-0 bg-white/[0.08]" />
 
           {/* Primary Top Pills */}
           <nav
@@ -399,8 +435,8 @@ export function Navbar() {
                 aria-label="Profiles"
                 className="inline-flex h-10 min-w-0 items-center gap-2 rounded-[18px] bg-white/[0.04] px-2.5 text-[12px] font-semibold text-white/[0.78] ring-1 ring-white/[0.06] transition-all duration-200 hover:bg-white/[0.11] hover:text-white/[0.95]"
               >
-                <span className="grid h-6 w-6 place-items-center rounded-full bg-[#da1b1b]/30 text-xs">
-                  {activeProfile?.avatarEmoji || "🎬"}
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-[#e02020] to-[#7a0f2a] text-[11px] font-bold uppercase text-white ring-1 ring-white/20">
+                  {(activeProfile?.name || user.name || "A").slice(0, 1)}
                 </span>
                 <span className="hidden max-w-[110px] truncate xl:inline">
                   {activeProfile?.name.split(" ")[0] || user.name}
@@ -467,8 +503,8 @@ export function Navbar() {
           aria-label="arkaflix home"
           className="inline-flex min-h-11 items-center gap-2 text-white"
         >
-          <ArkaflixLogoMark className="h-7 w-7 text-white" />
-          <span className="text-[20px] font-bold tracking-[-0.06em]">arkaflix</span>
+          <ArkaflixLogoMark className="h-6 w-auto text-white" />
+          <span className="text-[20px] font-bold tracking-[-0.06em]">Arkaflix</span>
         </Link>
 
         <div className="flex items-center gap-1">
@@ -567,7 +603,7 @@ export function Footer() {
       <div className="grid gap-9 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
         <div>
           <div className="flex items-center gap-2">
-            <ArkaflixLogoMark className="h-6 w-6 text-white" />
+            <ArkaflixLogoMark className="h-6 w-auto text-white" />
             <h2 className="text-lg font-semibold tracking-tight text-white">
               arkaflix
             </h2>

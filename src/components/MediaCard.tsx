@@ -143,6 +143,107 @@ export function MediaCard({
   );
 }
 
+/** dulo.mov landscape rail card (16:9) with the hover/focus info popover. */
+export function LandscapeCard({ item }: { item: CatalogItem }) {
+  const { isInWatchlist, toggleWatchlist } = useMarquee();
+  const [broken, setBroken] = useState(false);
+  const href = `/title/${item.type}/${item.id}`;
+  const saved = isInWatchlist(item.id);
+  const isSeries = item.type === "tv" || item.type === "anime";
+  const match = Math.min(99, Math.round(item.rating * 8.6 + 8));
+
+  return (
+    <div className="group relative w-[248px] shrink-0 snap-start sm:w-[286px] xl:w-[318px]">
+      <Link href={href} className="block">
+        <div className="relative aspect-video overflow-hidden rounded-[13px] bg-white/[0.05] ring-1 ring-white/[0.08] transition duration-200 group-hover:ring-white/70 group-focus-within:ring-white/70">
+          {!broken && item.backdropUrl ? (
+            <img
+              src={item.backdropUrl}
+              alt={item.title}
+              loading="lazy"
+              onError={() => setBroken(true)}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="grid h-full w-full place-items-center bg-[#16161c] text-xs text-white/40">
+              {item.title}
+            </div>
+          )}
+          {item.isNewRelease && (
+            <span className="absolute left-2.5 top-2.5 rounded bg-black/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/90">
+              Coming soon
+            </span>
+          )}
+        </div>
+      </Link>
+
+      {/* Popover on hover / focus — dulo shows match %, meta, genres, cast, blurb */}
+      <div className="pointer-events-none absolute left-1/2 top-full z-30 w-[330px] -translate-x-1/2 pt-2 opacity-0 transition-opacity duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+        <div className="rounded-[14px] border border-white/[0.1] bg-[#17171b] p-4 shadow-[0_24px_60px_rgba(0,0,0,0.8)]">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[13px] font-bold text-emerald-400">
+              {match}% match
+            </span>
+            <Link
+              href={`${href}?play=1`}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1 text-[11px] font-bold text-black"
+            >
+              <kbd className="grid h-4 min-w-4 place-items-center rounded border border-black/25 px-1 text-[9px]">
+                Enter
+              </kbd>
+              Open
+            </Link>
+          </div>
+          <h4 className="mt-2 text-[15px] font-bold leading-tight text-white">
+            {item.title}
+          </h4>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11.5px] text-white/60">
+            <span>{item.year}</span>
+            <span className="rounded border border-white/30 px-1 py-px text-[9px] font-bold uppercase">
+              {item.quality === "4K" ? "4K" : "HD"}
+            </span>
+            <span>{isSeries ? "Series" : "Film"}</span>
+            <span>{item.rating.toFixed(1)} rating</span>
+            <span>{item.runtime}</span>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {item.genres.slice(0, 3).map((g) => (
+              <span
+                key={g}
+                className="rounded-full bg-white/[0.09] px-2.5 py-0.5 text-[10.5px] font-semibold text-white/75"
+              >
+                {g}
+              </span>
+            ))}
+          </div>
+          {item.cast.length > 0 && (
+            <p className="mt-2 line-clamp-1 text-[11px] text-white/45">
+              Starring {item.cast.slice(0, 4).map((c) => c.name).join(", ")}
+            </p>
+          )}
+          <p className="mt-2 line-clamp-4 text-[11.5px] leading-[1.5] text-white/65">
+            {item.overview}
+          </p>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              toggleWatchlist(item);
+            }}
+            className={`mt-3 w-full rounded-lg py-1.5 text-[11px] font-bold transition ${
+              saved
+                ? "bg-[#e02020] text-white"
+                : "bg-white/[0.1] text-white/80 hover:bg-white/[0.18]"
+            }`}
+          >
+            {saved ? "In My List" : "+ My List"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface MediaRailProps {
   title: string;
   eyebrow?: string;
@@ -227,40 +328,7 @@ export function MediaRail({
         }`}
       >
         {landscape
-          ? items.map((item) => (
-              <Link
-                key={`${item.type}-${item.id}`}
-                href={`/title/${item.type}/${item.id}`}
-                data-rail-card="true"
-                className="group relative block w-[250px] shrink-0 snap-start sm:w-[290px] xl:w-[330px]"
-              >
-                <div className="relative aspect-video overflow-hidden rounded-[16px] bg-white/[0.04] shadow-[0_12px_32px_rgba(0,0,0,0.3)] ring-1 ring-white/[0.07] transition duration-300 group-hover:scale-[1.02] group-hover:ring-white/[0.5]">
-                  <img
-                    src={item.backdropUrl || item.posterUrl}
-                    alt={item.title}
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_34%,rgba(0,0,0,0.32)_66%,rgba(0,0,0,0.88)_100%)]" />
-                  <div className="absolute bottom-3 left-3.5 right-3.5">
-                    {item.logoUrl ? (
-                      <img
-                        src={item.logoUrl}
-                        alt={item.title}
-                        className="beta-hero-logo max-h-9 w-auto max-w-[75%] object-contain object-left"
-                      />
-                    ) : (
-                      <p className="truncate text-[13px] font-bold text-white drop-shadow">
-                        {item.title}
-                      </p>
-                    )}
-                    <p className="mt-1 text-[11px] font-medium text-white/65">
-                      {item.year} · ★ {item.rating.toFixed(1)}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))
+          ? items.map((item) => <LandscapeCard key={`${item.type}-${item.id}`} item={item} />)
           : items.map((item, idx) => (
               <MediaCard
                 key={`${item.type}-${item.id}`}

@@ -136,56 +136,84 @@ export default function HomePage() {
           <div className="beta-hero-shade absolute inset-0 bg-gradient-to-r from-black via-black/70 to-black/25 sm:via-black/60 sm:to-transparent" />
 
           <div className="arkaflix-rail-px relative z-10 mx-auto flex min-h-[max(520px,68svh)] w-full flex-col justify-end pb-14 pt-24 sm:min-h-[max(560px,74svh)] sm:pb-20">
-            <div className="max-w-2xl">
-              <p className="text-[10px] font-light italic tracking-[0.25em] text-white/80 text-shadow-hero sm:text-[11px] sm:tracking-[0.3em]">
-                <span className="font-semibold not-italic tracking-[0.35em] sm:tracking-[0.4em]">
-                  ARKAFLIX
+            <div className="max-w-[36rem]">
+              {/* Eyebrow: red "A." + FILM / SERIES */}
+              <p className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.22em] text-white/70">
+                <span className="text-[15px] font-black tracking-normal text-[#e02020]">
+                  A.
+                </span>
+                <span className="tracking-[0.3em]">
+                  {currentHero.type === "tv" || currentHero.type === "anime"
+                    ? "Series"
+                    : "Film"}
                 </span>
               </p>
 
-              {/* TMDB Official ClearLogo or Bold Uppercase Display Title */}
-              <div className="mt-2 flex min-h-20 items-end sm:min-h-36">
+              {/* Clear logo when TMDB has one, otherwise huge uppercase title */}
+              <div className="mt-2">
                 {currentHero.logoUrl ? (
                   <Link href={`/title/${currentHero.type}/${currentHero.id}`}>
                     <img
                       src={currentHero.logoUrl}
                       alt={currentHero.title}
-                      className="beta-hero-logo max-h-24 w-auto max-w-[78%] object-contain object-left sm:max-h-36 sm:max-w-md"
+                      className="beta-hero-logo max-h-24 w-auto max-w-[80%] object-contain object-left sm:max-h-36"
                     />
                   </Link>
                 ) : (
                   <Link href={`/title/${currentHero.type}/${currentHero.id}`}>
-                    <h1 className="max-w-3xl text-3xl font-black uppercase leading-[0.95] tracking-tight text-white text-shadow-hero sm:text-5xl md:text-6xl">
+                    <h1 className="max-w-3xl text-[2.6rem] font-black uppercase leading-[0.92] tracking-[-0.02em] text-white text-shadow-hero sm:text-6xl md:text-7xl">
                       {currentHero.title}
                     </h1>
                   </Link>
                 )}
               </div>
 
-              {/* Metadata Row */}
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-white/90 text-shadow-hero sm:mt-4 sm:text-sm">
-                <span className="inline-flex items-center gap-1">
-                  <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                  <span>{currentHero.rating.toFixed(1)}</span>
-                </span>
-                <span>{currentHero.year}</span>
-                {currentHero.genres.length > 0 && (
-                  <span className="hidden text-white/70 sm:inline">
-                    {currentHero.genres.slice(0, 3).join(" · ")}
+              {/* Meta: rating · date · HD · genres */}
+              <div className="mt-4 flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-[13px] font-semibold text-white/85 sm:text-[15px]">
+                <span className="inline-flex items-center gap-1.5">
+                  <Star className="h-3.5 w-3.5 fill-emerald-400 text-emerald-400" />
+                  <span className="text-emerald-300">
+                    {currentHero.rating.toFixed(1)}
                   </span>
+                </span>
+                <span className="text-white/75">{currentHero.releaseDate || currentHero.year}</span>
+                <span className="rounded border border-white/35 px-1.5 py-0.5 text-[11px] font-bold uppercase text-white/80">
+                  {currentHero.quality === "4K" ? "4K" : "HD"}
+                </span>
+                {currentHero.runtime && (
+                  <span className="text-white/70">{currentHero.runtime}</span>
                 )}
+                <span className="text-white/70">
+                  {currentHero.genres.slice(0, 3).join(" · ")}
+                </span>
               </div>
 
-              <p className="mt-3 max-w-xl line-clamp-2 text-sm leading-[1.5] text-white/85 text-shadow-hero sm:mt-4 md:text-base">
+              {currentHero.tagline && (
+                <p className="mt-3 text-[13px] italic text-white/60">
+                  {currentHero.tagline}
+                </p>
+              )}
+
+              <p className="mt-3 max-w-lg line-clamp-3 text-[13.5px] leading-[1.55] text-white/85 text-shadow-hero sm:text-[15px]">
                 {currentHero.overview}
               </p>
 
-              {/* arkaflix.app Hero Action Buttons */}
-              <div data-tv-row="hero-actions" className="mt-5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3">
+              {currentHero.cast.length > 0 && (
+                <p className="mt-2.5 line-clamp-1 text-[12.5px] text-white/55">
+                  Starring{" "}
+                  {currentHero.cast.slice(0, 4).map((c) => c.name).join(", ")}
+                </p>
+              )}
+
+              {/* Buttons: filled primary + frosted secondary */}
+              <div
+                data-tv-row="hero-actions"
+                className="mt-6 flex flex-wrap items-center gap-3"
+              >
                 <Link
                   href={`/title/${currentHero.type}/${currentHero.id}?play=1`}
                   data-tv-autofocus
-                  className="beta-action inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-white px-7 text-sm font-semibold text-black transition-all hover:bg-white/90 sm:text-base"
+                  className="inline-flex h-[52px] items-center justify-center gap-2.5 whitespace-nowrap rounded-xl bg-white px-7 text-[15px] font-bold text-black transition hover:bg-white/90"
                 >
                   <Play className="h-4 w-4 fill-current" />
                   <span>Watch Now</span>
@@ -193,7 +221,7 @@ export default function HomePage() {
 
                 <Link
                   href={`/title/${currentHero.type}/${currentHero.id}`}
-                  className="beta-action inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-white/15 px-7 text-sm font-semibold text-white backdrop-blur transition-all hover:bg-white/25 sm:text-base"
+                  className="inline-flex h-[52px] items-center justify-center gap-2.5 whitespace-nowrap rounded-xl bg-white/[0.14] px-6 text-[15px] font-bold text-white ring-1 ring-white/[0.1] backdrop-blur transition hover:bg-white/[0.22]"
                 >
                   <Info className="h-4 w-4" />
                   <span>More Info</span>
@@ -378,6 +406,7 @@ export default function HomePage() {
           href="/shows"
           items={top10Shows}
           ranked
+          landscape
         />
 
         {/* ARKAFLIX.MOV TOP 10 MOVIES */}
@@ -386,6 +415,7 @@ export default function HomePage() {
           href="/movies"
           items={top10Movies}
           ranked
+          landscape
         />
 
         {/* POPULAR MOVIES */}
