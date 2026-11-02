@@ -71,6 +71,7 @@ export function FullscreenCinemaPlayer({
   const [streamIndex, setStreamIndex] = useState(0);
   const [manualStream, setManualStream] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
   const [hudVisible, setHudVisible] = useState(true);
   const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
   const [episodesDrawerOpen, setEpisodesDrawerOpen] = useState(false);
@@ -83,6 +84,7 @@ export function FullscreenCinemaPlayer({
     setStreamIndex(0);
     setManualStream(false);
     setIframeLoaded(false);
+    setLoadTimedOut(false);
   }, [streams, season, episode, item.id]);
 
   useEffect(() => {
@@ -97,6 +99,17 @@ export function FullscreenCinemaPlayer({
 
   const activeStream: ResolvedStreamOption | undefined =
     streams[streamIndex] || streams[0];
+
+  // Show an escape hatch if the selected embed is blocked or hangs (especially
+  // VidKing on restrictive networks). No sandbox is used on the iframe.
+  useEffect(() => {
+    if (!open || !activeStream || iframeLoaded) {
+      setLoadTimedOut(false);
+      return;
+    }
+    const timer = setTimeout(() => setLoadTimedOut(true), 8000);
+    return () => clearTimeout(timer);
+  }, [open, activeStream, iframeLoaded]);
 
   // Lock page scroll & request OS fullscreen on open
   useEffect(() => {
@@ -350,6 +363,7 @@ export function FullscreenCinemaPlayer({
                   }
                 }
                 setIframeLoaded(false);
+                setLoadTimedOut(false);
                 revealHud();
               }}
               className="max-w-[148px] cursor-pointer bg-transparent text-xs font-semibold text-white outline-none sm:max-w-[210px]"
@@ -467,11 +481,51 @@ export function FullscreenCinemaPlayer({
       {/* FULLSCREEN STREAMING IFRAME STAGE */}
       <div className="relative flex h-full w-full flex-1 items-center justify-center bg-black">
         {(resolvingStreams && !activeStream) || !iframeLoaded ? (
-          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]/90">
-            <Loader2 className="h-10 w-10 animate-spin text-[#da1b1b]" />
-            <p className="text-xs font-semibold text-white/85">
-              Launching {item.title} on VidCore 4K...
-            </p>
+          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]/90 px-6 text-center">
+            {!loadTimedOut ? (
+              <>
+                <Loader2 className="h-10 w-10 animate-spin text-[#da1b1b]" />
+                <p className="text-xs font-semibold text-white/85">
+                  Launching {item.title} on {activeStream?.provider || "VidCore"}...
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="max-w-md text-sm font-semibold text-white">
+                  {activeStream?.provider || "This stream"} is taking longer to
+                  load. Your network or browser may be blocking the embed.
+                </p>
+                <p className="max-w-md text-xs text-white/60">
+                  The player is not sandboxed. Try opening the source directly
+                  or switch to another API.
+                </p>
+                <div className="pointer-events-auto mt-2 flex flex-wrap items-center justify-center gap-2">
+                  {activeStream && (
+                    <a
+                      href={activeStream.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-10 items-center rounded-full bg-white px-5 text-xs font-semibold text-black hover:bg-white/90"
+                    >
+                      Open {activeStream.provider} in new tab
+                    </a>
+                  )}
+                  {streamIndex < streams.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStreamIndex((idx) => idx + 1);
+                        setIframeLoaded(false);
+                        setLoadTimedOut(false);
+                      }}
+                      className="inline-flex h-10 items-center rounded-full bg-white/10 px-5 text-xs font-semibold text-white ring-1 ring-white/15 hover:bg-white/20"
+                    >
+                      Try next API
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         ) : null}
 
@@ -480,10 +534,15 @@ export function FullscreenCinemaPlayer({
             key={`${activeStream.id}-${activeStream.url}`}
             src={activeStream.url}
             title={item.title}
-            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+            // Intentionally NO sandbox attribute: VidKing and other embed
+            // players need unrestricted script, media, and fullscreen access.
+            allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write"
             allowFullScreen
-            referrerPolicy="origin"
-            onLoad={() => setIframeLoaded(true)}
+            referrerPolicy="no-referrer-when-downgrade"
+            onLoad={() => {
+              setIframeLoaded(true);
+              setLoadTimedOut(false);
+            }}
             onError={() => {
               if (!manualStream && streamIndex < streams.length - 1) {
                 setStreamIndex((idx) => idx + 1);
