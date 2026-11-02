@@ -334,12 +334,30 @@ export default function PlatformSupport() {
     window.addEventListener("keydown", onKeyDown);
 
     // Initial focus: hero CTA if present, otherwise first card in the first row.
-    const timer = window.setTimeout(() => {
-      const preferred =
-        document.querySelector<HTMLElement>("[data-tv-autofocus]") ??
-        closestInRow(allRows()[0], window.innerWidth / 2);
-      focusEl(preferred);
-    }, 350);
+    // Content on TV devices can arrive after mount (client-rendered rails), so
+    // retry a few times until something focusable exists — but never steal
+    // focus once the viewer has started moving.
+    let attempts = 0;
+    let timer = 0;
+    const primeFocus = () => {
+      attempts += 1;
+      const active = document.activeElement as HTMLElement | null;
+      const alreadyFocused =
+        active && active !== document.body && isVisible(active);
+      if (!alreadyFocused) {
+        const preferred =
+          document.querySelector<HTMLElement>("[data-tv-autofocus]") ??
+          closestInRow(allRows()[0], window.innerWidth / 2);
+        if (preferred) {
+          focusEl(preferred);
+          return;
+        }
+      }
+      if (attempts < 6) {
+        timer = window.setTimeout(primeFocus, 250 + attempts * 250);
+      }
+    };
+    timer = window.setTimeout(primeFocus, 300);
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
