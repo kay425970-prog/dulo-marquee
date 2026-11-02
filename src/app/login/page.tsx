@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMarquee } from "@/components/MarqueeProvider";
@@ -20,8 +20,25 @@ function LoginContent() {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [dbReady, setDbReady] = useState<boolean | null>(null);
 
   const next = searchParams.get("next") || "/";
+
+  // Tell the user up-front when this deployment has no database attached.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/health")
+      .then((r) => r.json())
+      .then((d) => {
+        if (!cancelled) setDbReady(Boolean(d.database));
+      })
+      .catch(() => {
+        if (!cancelled) setDbReady(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +96,21 @@ function LoginContent() {
             </button>
           ))}
         </div>
+
+        {dbReady === false && (
+          <div
+            role="status"
+            className="mt-5 rounded-xl bg-amber-500/12 px-3.5 py-3 text-[11.5px] leading-relaxed text-amber-200/90 ring-1 ring-amber-400/30"
+          >
+            <strong className="font-semibold text-amber-100">
+              Database not connected on this deployment.
+            </strong>{" "}
+            Browsing, TMDB artwork and playback all work — but accounts need
+            persistence. Add a{" "}
+            <code className="font-mono text-amber-100">DATABASE_URL</code>{" "}
+            environment variable (any Postgres) and redeploy to enable sign in.
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           {mode === "signup" && (
