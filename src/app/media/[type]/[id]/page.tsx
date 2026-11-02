@@ -915,7 +915,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
             </div>
 
             {loadingSeason ? (
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div data-tv-row="episodes" data-tv-grid className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                   <div
                     key={n}
@@ -924,7 +924,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
                 ))}
               </div>
             ) : (
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div data-tv-row="episodes" data-tv-grid className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {activeSeasonObj.episodes.map((ep) => {
                   const hiddenByShield =
                     spoilerShield && !revealedEpisodes.has(ep.number);
@@ -1014,7 +1014,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
             <h2 className="mb-3 text-[16px] font-semibold text-white/[0.92] sm:text-[17px]">
               Cast
             </h2>
-            <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-2 pt-1">
+            <div data-tv-row="cast" className="scrollbar-hide flex gap-4 overflow-x-auto pb-2 pt-1">
               {item.cast.map((actor) => (
                 <Link
                   key={`${actor.name}-${actor.character}`}

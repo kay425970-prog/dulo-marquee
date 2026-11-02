@@ -181,7 +181,7 @@ export default function HomePage() {
               </p>
 
               {/* dulo.mov Hero Action Buttons */}
-              <div className="mt-5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3">
+              <div data-tv-row="hero-actions" className="mt-5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3">
                 <Link
                   href={`/title/${currentHero.type}/${currentHero.id}?play=1`}
                   data-tv-autofocus
@@ -240,7 +240,7 @@ export default function HomePage() {
       <div className="relative z-10 space-y-9 pt-4 sm:space-y-11">
         {/* CONTINUE WATCHING RAIL */}
         {continueWatching.length > 0 && (
-          <section aria-label="Continue watching">
+          <section aria-label="Continue watching" data-tv-row="continue-watching">
             <div className="dulo-rail-px mb-3 flex items-end justify-between">
               <h2 className="text-[17px] font-semibold leading-none text-white/[0.92] sm:text-[19px]">
                 Continue Watching
@@ -306,6 +306,7 @@ export default function HomePage() {
         {/* DULO.MOV CHANNELS & APPS RAIL (.beta-provider-rail + .beta-service-card) */}
         <section
           aria-labelledby="channels-apps-heading"
+          data-tv-row="channels-apps"
           className="beta-provider-rail relative min-w-0"
         >
           <div className="dulo-rail-px mb-3 flex items-end justify-between gap-4">

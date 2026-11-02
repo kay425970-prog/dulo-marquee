@@ -366,7 +366,8 @@ export function DuloShelfBrowser({
               </div>
             </div>
           ) : (
-            <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-7">
+            <div data-tv-row="browse-grid" data-tv-grid
+              className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-7">
               {filteredItems.map((item) => (
                 <MediaCard
                   key={`${item.tmdbMediaType}-${item.id}`}

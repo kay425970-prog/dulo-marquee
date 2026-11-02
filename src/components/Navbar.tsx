@@ -353,6 +353,7 @@ export function Navbar() {
           <nav
             className="ml-1 flex min-w-0 flex-none items-center gap-1"
             aria-label="Primary top"
+            data-tv-row="top-nav"
           >
             {primaryNav.map((item) => {
               const Icon = item.icon;

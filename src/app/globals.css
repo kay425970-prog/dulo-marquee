@@ -404,3 +404,80 @@ video::cue {
 
 /* 10-foot UI: bigger captions on TVs */
 .tv-mode video::cue { font-size: 1.35em; }
+
+/* ============================================================
+   TV remote focus — YouTube-on-TV feel
+   Focused cards reveal their hover overlay, lift, and get a
+   high-contrast ring that reads from 3 metres away.
+   ============================================================ */
+
+.tv-mode :focus {
+  scroll-margin: 120px;
+}
+
+/* Poster cards: surface the hover overlay + action buttons on focus */
+.tv-mode [data-rail-card]:focus-within .dulo-card-overlay,
+.tv-mode a:focus .dulo-card-overlay,
+.tv-mode [data-tv-row] a:focus .dulo-card-overlay,
+.tv-mode [data-tv-row] button:focus .dulo-card-overlay,
+.tv-mode .group:has(> a:focus) .dulo-card-overlay {
+  opacity: 1 !important;
+}
+
+.tv-mode [data-tv-row] a:focus img,
+.tv-mode [data-tv-row] button:focus img {
+  opacity: 0.72;
+  transform: scale(1.05);
+}
+
+/* Lift the focused poster tile */
+.tv-mode [data-tv-row] a:focus,
+.tv-mode [data-tv-row] button:focus {
+  transform: translateY(-4px) scale(1.045);
+  z-index: 6;
+}
+
+/* Card titles + year become full white while focused */
+.tv-mode [data-tv-row] a:focus h3,
+.tv-mode [data-tv-row] a:focus p,
+.tv-mode [data-tv-row] button:focus {
+  color: #ffffff;
+}
+
+/* Ensure the focus ring is never clipped by overflow: hidden tiles */
+.tv-mode [data-tv-row] {
+  padding-block: 10px;
+  overflow-y: visible;
+}
+
+/* Horizontal rails: allow the ring to escape the scroller */
+.tv-mode [data-tv-rail] {
+  padding-block: 12px;
+}
+
+/* Header pills and small controls need a tighter ring */
+.tv-mode header a:focus,
+.tv-mode header button:focus,
+.tv-mode nav a:focus,
+.tv-mode nav button:focus {
+  transform: scale(1.06);
+}
+
+/* Fullscreen player HUD: keep ring visible over video */
+.tv-mode video:focus {
+  outline: 3px solid #ffffff;
+  outline-offset: -6px;
+}
+
+/* Prevent the page from scrolling sideways on TV */
+html.tv-mode {
+  overflow-x: hidden;
+  scroll-padding-block: 96px;
+}
+
+/* Subtle focus transition (fast enough to feel instant) */
+.tv-mode [data-tv-row] a,
+.tv-mode [data-tv-row] button {
+  transition: transform 0.14s ease-out, box-shadow 0.14s ease-out,
+    outline-color 0.14s ease-out;
+}

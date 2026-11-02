@@ -154,7 +154,8 @@ function ProvidersContent() {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8">
+        <div data-tv-row="service-grid" data-tv-grid
+          className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8">
           {displayItems.map((item) => (
             <MediaCard
               key={`${item.tmdbMediaType}-${item.id}`}

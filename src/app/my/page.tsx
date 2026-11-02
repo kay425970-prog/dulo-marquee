@@ -424,7 +424,8 @@ function MyLibraryContent() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8">
+            <div data-tv-row="my-grid" data-tv-grid
+              className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8">
               {watchlistEntries.map((entry) => (
                 <MediaCard
                   key={entry.id}
@@ -448,7 +449,8 @@ function MyLibraryContent() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8">
+            <div data-tv-row="my-grid" data-tv-grid
+              className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8">
               {favoriteEntries.map((entry) => (
                 <MediaCard
                   key={entry.id}

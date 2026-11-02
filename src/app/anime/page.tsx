@@ -228,7 +228,8 @@ export default function AnimePage() {
           ))}
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8">
+        <div data-tv-row="anime-grid" data-tv-grid
+          className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8">
           {filteredAnime.map((item) => (
             <MediaCard
               key={`${item.tmdbMediaType}-${item.id}`}

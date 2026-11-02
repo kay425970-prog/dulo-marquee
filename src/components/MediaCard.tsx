@@ -128,6 +128,8 @@ export function MediaCard({
 
       <Link
         href={detailHref}
+        tabIndex={-1}
+        aria-hidden="true"
         className="mt-2 block min-w-0 transition duration-300 group-hover:-translate-y-0.5"
       >
         <p className="truncate text-[12px] font-semibold leading-[1.16] text-white/[0.80] transition-colors duration-300 group-hover:text-white/[0.98] sm:text-[13px]">
@@ -172,6 +174,7 @@ export function MediaRail({
   return (
     <section
       aria-label={title}
+      data-tv-row={title}
       className={`group/rail relative ${
         ranked ? "home-rail-ranked" : ""
       }`}
