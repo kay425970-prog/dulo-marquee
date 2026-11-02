@@ -10,7 +10,11 @@ import * as schema from "./schema";
  * Instead we warn loudly and let the first real query surface a clear error.
  */
 const databaseUrl =
-  process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.DATABASE_URL_UNPOOLED;
+  process.env.DATABASE_URL ||
+  process.env.NETLIFY_DATABASE_URL ||
+  process.env.NETLIFY_DB_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL_UNPOOLED;
 
 export const dbConfigured = Boolean(databaseUrl);
 
