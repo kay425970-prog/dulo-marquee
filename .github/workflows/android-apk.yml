@@ -33,8 +33,27 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # The ubuntu runner ships with the Android SDK preinstalled. The
+      # android-actions/setup-android action now fails because the legacy
+      # "tools" package was removed, so configure the existing SDK directly.
+      - name: Configure Android SDK
+        run: |
+          set -e
+          export ANDROID_HOME="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}"
+          if [ ! -d "$ANDROID_HOME" ]; then export ANDROID_HOME="$HOME/android-sdk"; fi
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH" >> "$GITHUB_ENV"
+
+          SDKMANAGER="$(ls "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager 2>/dev/null | head -1 || true)"
+          echo "sdkmanager: ${SDKMANAGER:-<none>}"
+          if [ -n "$SDKMANAGER" ]; then
+            yes 2>/dev/null | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+            "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0" > /dev/null 2>&1 || true
+          fi
+
+          echo "platforms: $(ls "$ANDROID_HOME/platforms" 2>/dev/null | tr '\n' ' ')"
+          echo "build-tools: $(ls "$ANDROID_HOME/build-tools" 2>/dev/null | tr '\n' ' ')"
 
       - name: Install JS dependencies
         run: npm ci
