@@ -139,9 +139,9 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "Videasy",
     label: "Videasy Ultra",
     host: "player.videasy.to",
-    tier: 4,
+    tier: 0,
     timeoutMs: 4400,
-    qualityTag: "Videasy · 1080p/4K Ultra",
+    qualityTag: "Videasy · 1080p/4K Primary",
     movie: (id) => `https://player.videasy.to/movie/${id}?color=DA1B1B`,
     tv: (id, s, e) =>
       `https://player.videasy.to/tv/${id}/${s}/${e}?color=DA1B1B&nextEpisode=true&autoplayNextEpisode=true`,
@@ -458,14 +458,19 @@ export async function GET(req: NextRequest) {
     qualityTag: engine.qualityTag,
   }));
 
-  // Anime sub/dub providers lead anime playback.
-  const animeFirst = (list: ResolvedStreamOption[]) =>
-    useAnimeEngines
-      ? [
-          ...list.filter((s) => s.id.startsWith("megavid-")),
-          ...list.filter((s) => !s.id.startsWith("megavid-")),
-        ]
-      : list;
+  // Anime sub/dub providers lead anime; Videasy leads movies & series.
+  const animeFirst = (list: ResolvedStreamOption[]) => {
+    if (useAnimeEngines) {
+      return [
+        ...list.filter((s) => s.id.startsWith("megavid-")),
+        ...list.filter((s) => !s.id.startsWith("megavid-")),
+      ];
+    }
+    return [
+      ...list.filter((s) => s.id === "videasy"),
+      ...list.filter((s) => s.id !== "videasy"),
+    ];
+  };
 
   const ordered: ResolvedStreamOption[] =
     healthy.length > 0
@@ -498,16 +503,16 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     primary:
       primary ?? {
-        id: "vidbolt",
-        provider: "VidBolt",
-        label: "VidBolt HD",
-        url: `https://vidbolt.pro/embed/movie/${tmdbId}`,
+        id: "videasy",
+        provider: "Videasy",
+        label: "Videasy Ultra",
+        url: `https://player.videasy.to/movie/${tmdbId}?color=DA1B1B`,
         latencyMs: 320,
-        qualityTag: "VidBolt · HD Primary · Multi-Sub",
+        qualityTag: "Videasy · 1080p/4K Primary",
       },
     backups: finalOrdered.slice(1),
     engines,
-    prioritizedProvider: primary?.provider ?? "VidBolt",
+    prioritizedProvider: primary?.provider ?? "Videasy",
     engineCount: finalOrdered.length,
     blockedFamilies: ["vidsrc"],
     autoResolved: true,
