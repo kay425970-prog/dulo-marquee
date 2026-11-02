@@ -472,7 +472,7 @@ export function FullscreenCinemaPlayer({
           {/* Universal subtitle engine — remote-friendly picker, not a <select> */}
           <TvPicker
             icon={<Captions className="h-3.5 w-3.5" />}
-            label="Subtitles"
+            label={prefs.subtitleLang === "off" ? "CC Off" : "Subtitles"}
             value={prefs.subtitleLang}
             badge={
               !subtitleLoading && subtitleTracks.length > 0
