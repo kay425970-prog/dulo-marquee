@@ -1,9 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <rect width="1024" height="1024" rx="224" fill="#0a0a0a"/>
-  <g transform="translate(512 512) scale(1.95) translate(-528 -498)">
-    <g transform="translate(0,1024) scale(0.1,-0.1)" fill="#ffffff">
-      <path d="M5457 6280 c1 -368 -1 -670 -4 -670 -3 0 -38 25 -78 55 -440 331 -1087 272 -1469 -135 -219 -233 -331 -550 -313 -884 22 -394 196 -723 492 -926 222 -153 561 -214 855 -154 159 33 356 131 458 229 l52 51 1 -30 c1 -17 2 -75 3 -128 l1 -98 303 0 302 0 0 1680 0 1680 -302 0 -303 0 2 -670z m-537 -930 c157 -25 289 -96 396 -214 111 -121 164 -266 164 -450 0 -359 -280 -636 -645 -638 -176 -1 -322 58 -445 182 -130 130 -190 278 -190 470 0 201 53 334 184 466 150 150 338 215 536 184z"/>
-      <path d="M6523 4255 c-100 -31 -186 -103 -231 -194 -24 -50 -27 -67 -27 -156 0 -95 2 -103 34 -163 40 -74 93 -124 171 -161 48 -23 68 -26 155 -26 88 0 107 3 157 27 63 29 146 105 174 159 22 43 44 125 44 164 0 99 -68 231 -149 291 -88 65 -229 90 -328 59z"/>
-    </g>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff3b3b"/>
+      <stop offset="52%" stop-color="#da1b1b"/>
+      <stop offset="100%" stop-color="#8a0d0d"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="48%" stop-color="#ffffff" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    
+  <mask id="mark">
+    <rect width="512" height="512" fill="#000"/>
+    <circle cx="222" cy="300" r="118" fill="#fff"/>
+    <rect x="288" y="106" width="64" height="312" rx="32" fill="#fff"/>
+    <circle cx="398" cy="386" r="36" fill="#fff"/>
+    <circle cx="222" cy="300" r="51" fill="#000"/>
+  </mask>
+  </defs>
+  <rect width="512" height="512" rx="115.20" ry="115.20" fill="url(#bg)"/><rect width="512" height="512" rx="115.20" ry="115.20" fill="url(#sheen)"/>
+  <rect width="512" height="512" fill="#ffffff" mask="url(#mark)"/>
+  <rect x="7.17" y="7.17" width="497.66" height="497.66" rx="115.20" ry="115.20" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="7.17"/>
 </svg>

@@ -64,16 +64,27 @@ if (!xml.includes("android:configChanges")) {
   );
 }
 
-/* 5. Copy artwork into res/drawable. */
+/* 5. Copy artwork into res/drawable (TV banner is required by leanback). */
 const drawableDir = join(ANDROID, "app", "src", "main", "res", "drawable");
 mkdirSync(drawableDir, { recursive: true });
 
-const bannerSource = existsSync("public/icon-512.png")
-  ? "public/icon-512.png"
-  : "public/icon-192.png";
-if (existsSync(bannerSource)) {
+const bannerSource =
+  [
+    "public/icon-512.png",
+    "public/icon-192.png",
+    "public/icon-1024.png",
+    "src/app/apple-icon.png",
+    "electron/build/icon.png",
+  ].find((p) => existsSync(p)) ?? null;
+
+if (bannerSource) {
   copyFileSync(bannerSource, join(drawableDir, "tv_banner.png"));
   console.log(`✔ TV banner → res/drawable/tv_banner.png (from ${bannerSource})`);
+} else {
+  // Never let a missing image break the build: drop the banner reference so
+  // AAPT doesn't fail on an unresolved @drawable/tv_banner resource.
+  console.warn("⚠ No banner artwork found — removing android:banner reference.");
+  xml = xml.replace(/\s*android:banner="[^"]*"/, "");
 }
 
 if (xml !== original) {

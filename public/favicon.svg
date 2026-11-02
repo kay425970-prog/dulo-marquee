@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff3b3b"/>
+      <stop offset="52%" stop-color="#da1b1b"/>
+      <stop offset="100%" stop-color="#8a0d0d"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="48%" stop-color="#ffffff" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    
+  <mask id="mark">
+    <rect width="512" height="512" fill="#000"/>
+    <circle cx="222" cy="300" r="118" fill="#fff"/>
+    <rect x="288" y="106" width="64" height="312" rx="32" fill="#fff"/>
+    <circle cx="398" cy="386" r="36" fill="#fff"/>
+    <circle cx="222" cy="300" r="51" fill="#000"/>
+  </mask>
+  </defs>
+  <rect width="512" height="512" rx="115.20" ry="115.20" fill="url(#bg)"/><rect width="512" height="512" rx="115.20" ry="115.20" fill="url(#sheen)"/>
+  <rect width="512" height="512" fill="#ffffff" mask="url(#mark)"/>
+  <rect x="7.17" y="7.17" width="497.66" height="497.66" rx="115.20" ry="115.20" fill="none" stroke="#ffffff" stroke-opacity="0.15" stroke-width="7.17"/>
+</svg>
