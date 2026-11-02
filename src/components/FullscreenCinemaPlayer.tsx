@@ -3,6 +3,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CatalogItem } from "@/lib/catalog";
 import type { ResolvedStreamOption } from "@/app/api/stream-resolve/route";
+import { TvPicker } from "./TvPicker";
+import { SubtitleOverlay } from "./SubtitleOverlay";
 import {
   ArrowLeft,
   Maximize2,
@@ -97,6 +99,7 @@ export function FullscreenCinemaPlayer({
   const [subtitleNotice, setSubtitleNotice] = useState<string | null>(null);
   const [detectedAudioLangs, setDetectedAudioLangs] = useState<string[]>([]);
   const [audioNotice, setAudioNotice] = useState<string | null>(null);
+  const [subOffset, setSubOffset] = useState(0);
 
   useEffect(() => {
     setStreamIndex(0);
@@ -330,6 +333,18 @@ export function FullscreenCinemaPlayer({
     return () => clearTimeout(timer);
   }, [open, activeStream, iframeLoaded, streamIndex, streams.length, manualStream]);
 
+  /**
+   * Subtitle clock for embeds.
+   * `undefined` lets SubtitleOverlay run its own timer; when an embed posts a
+   * real currentTime we switch to that value so cues stay in sync.
+   */
+  const [embedClock, setEmbedClock] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    setEmbedClock(undefined);
+    setSubOffset(0);
+  }, [activeStream?.id, season, episode, item.id]);
+
   // Listen for progress telemetry emitted via postMessage
   useEffect(() => {
     if (!open) return;
@@ -345,11 +360,16 @@ export function FullscreenCinemaPlayer({
           payload?.timestamp;
         const duration = payload?.data?.duration ?? payload?.duration;
 
+        if (typeof current === "number" && current >= 0) {
+          setEmbedClock(current);
+        }
+
         if (
           typeof current === "number" &&
           typeof duration === "number" &&
           duration > 30
         ) {
+          setEmbedClock(current);
           const pct = Math.min(
             99,
             Math.max(1, Math.round((current / duration) * 100))
@@ -493,34 +513,63 @@ export function FullscreenCinemaPlayer({
 
         {/* Right: API Selector + Episode Switcher + Watch Party + Native Fullscreen */}
         <div className="flex items-center gap-2">
-          {/* Universal subtitle engine */}
-          <div className="flex h-10 items-center gap-1.5 rounded-full bg-[#0d0d0d]/80 px-3 ring-1 ring-white/[0.1] backdrop-blur-2xl">
-            <Captions className="h-3.5 w-3.5 shrink-0 text-white/70" />
-            <select
-              aria-label="Subtitles"
-              value={prefs.subtitleLang}
-              onMouseDown={revealHud}
-              onChange={(e) => updatePrefs({ subtitleLang: e.target.value })}
-              className="max-w-[112px] cursor-pointer bg-transparent text-xs font-semibold text-white outline-none sm:max-w-[136px]"
-            >
-              {SUBTITLE_LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code} className="bg-[#171717] text-white">
-                  {l.code === "off" ? "CC Off" : l.label}
-                </option>
-              ))}
-            </select>
-            {subtitleLoading && (
-              <Loader2 className="h-3 w-3 animate-spin text-white/50" />
-            )}
-            {!subtitleLoading && subtitleTracks.length > 0 && (
-              <span className="rounded bg-emerald-500/20 px-1 text-[10px] font-bold text-emerald-300">
-                {subtitleTracks.length}
-              </span>
-            )}
-          </div>
+          {/* Universal subtitle engine — remote-friendly picker, not a <select> */}
+          <TvPicker
+            icon={<Captions className="h-3.5 w-3.5" />}
+            label="Subtitles"
+            value={prefs.subtitleLang}
+            badge={
+              !subtitleLoading && subtitleTracks.length > 0
+                ? subtitleTracks.length
+                : undefined
+            }
+            active={prefs.subtitleLang !== "off" && subtitleTracks.length > 0}
+            warn={prefs.subtitleLang !== "off" && !subtitleLoading && subtitleTracks.length === 0}
+            title="Subtitle language (overlays the video)"
+            onInteract={revealHud}
+            options={SUBTITLE_LANGUAGES.map((l) => ({
+              value: l.code,
+              label: l.code === "off" ? "CC Off" : l.label,
+            }))}
+            onChange={(v) => updatePrefs({ subtitleLang: v })}
+          />
 
-          {/* Universal audio engine */}
-          <div
+          {/* Subtitle timing nudge — fixes drift on embeds */}
+          {prefs.subtitleLang !== "off" && subtitleTracks.length > 0 && (
+            <div className="hidden h-10 items-center gap-1 rounded-full bg-[#0d0d0d]/80 px-2 ring-1 ring-white/[0.1] backdrop-blur-2xl sm:flex">
+              <button
+                type="button"
+                onClick={() => setSubOffset((v) => Math.round((v - 0.5) * 10) / 10)}
+                title="Subtitles earlier"
+                className="grid h-7 w-7 place-items-center rounded-full text-white/70 hover:bg-white/[0.12] hover:text-white"
+              >
+                −
+              </button>
+              <span className="min-w-11 text-center text-[11px] font-bold tabular-nums text-white/75">
+                {subOffset > 0 ? "+" : ""}
+                {subOffset.toFixed(1)}s
+              </span>
+              <button
+                type="button"
+                onClick={() => setSubOffset((v) => Math.round((v + 0.5) * 10) / 10)}
+                title="Subtitles later"
+                className="grid h-7 w-7 place-items-center rounded-full text-white/70 hover:bg-white/[0.12] hover:text-white"
+              >
+                +
+              </button>
+            </div>
+          )}
+
+          {/* Universal audio engine — remote-friendly picker */}
+          <TvPicker
+            icon={<Volume2 className="h-3.5 w-3.5" />}
+            label="Audio"
+            value={prefs.audioLang}
+            active={prefs.audioLang !== "orig" && audioLanguageAvailable}
+            warn={prefs.audioLang !== "orig" && Boolean(audioNotice)}
+            badge={
+              detectedAudioLangs.length > 1 ? detectedAudioLangs.length : undefined
+            }
             title={
               audioSwitchingSupported
                 ? detectedAudioLangs.length > 1
@@ -528,50 +577,20 @@ export function FullscreenCinemaPlayer({
                   : "This stream exposes a single audio track"
                 : "This provider controls its own audio tracks"
             }
-            className={`flex h-10 items-center gap-1.5 rounded-full px-3 ring-1 backdrop-blur-2xl ${
-              prefs.audioLang !== "orig" && audioNotice
-                ? "bg-amber-500/20 ring-amber-400/40"
-                : "bg-[#0d0d0d]/80 ring-white/[0.1]"
-            }`}
-          >
-            <Volume2
-              className={`h-3.5 w-3.5 shrink-0 ${
-                prefs.audioLang !== "orig" && audioLanguageAvailable
-                  ? "text-emerald-400"
-                  : "text-white/70"
-              }`}
-            />
-            <select
-              aria-label="Audio language"
-              value={prefs.audioLang}
-              onMouseDown={revealHud}
-              onChange={(e) => updatePrefs({ audioLang: e.target.value })}
-              className="max-w-[112px] cursor-pointer bg-transparent text-xs font-semibold text-white outline-none sm:max-w-[140px]"
-            >
-              {AUDIO_LANGUAGES.map((l) => {
-                const code = l.code;
-                const unavailable =
-                  code !== "orig" &&
-                  detectedAudioLangs.length > 1 &&
-                  !detectedAudioLangs.includes(code);
-                return (
-                  <option
-                    key={code}
-                    value={code}
-                    className="bg-[#171717] text-white"
-                  >
-                    {l.label}
-                    {unavailable ? " · not in stream" : ""}
-                  </option>
-                );
-              })}
-            </select>
-            {detectedAudioLangs.length > 1 && (
-              <span className="rounded bg-emerald-500/20 px-1 text-[10px] font-bold text-emerald-300">
-                {detectedAudioLangs.length}
-              </span>
-            )}
-          </div>
+            onInteract={revealHud}
+            options={AUDIO_LANGUAGES.map((l) => {
+              const unavailable =
+                l.code !== "orig" &&
+                detectedAudioLangs.length > 1 &&
+                !detectedAudioLangs.includes(l.code);
+              return {
+                value: l.code,
+                label: l.label,
+                hint: unavailable ? "not in this stream" : undefined,
+              };
+            })}
+            onChange={(v) => updatePrefs({ audioLang: v })}
+          />
 
           {/* Fill / fit toggle */}
           <button
@@ -805,6 +824,19 @@ export function FullscreenCinemaPlayer({
               }
             }}
             className="absolute inset-0 h-full w-full border-0"
+          />
+        )}
+
+        {/* Subtitles rendered as a DOM overlay so captions work on top of
+            third-party embeds too (we cannot inject <track> into them). */}
+        {activeStream && prefs.subtitleLang !== "off" && subtitleTracks[0] && (
+          <SubtitleOverlay
+            vttUrl={subtitleTracks[0].url}
+            currentTime={embedClock}
+            running={iframeLoaded && !loadTimedOut}
+            offset={subOffset}
+            size={prefs.subtitleSize === "sm" ? "sm" : prefs.subtitleSize === "lg" ? "lg" : "md"}
+            background={prefs.subtitleBg}
           />
         )}
 
