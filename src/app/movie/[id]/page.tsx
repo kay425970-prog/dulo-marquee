@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-export default async function DuloMovieAlias({
+export default async function ArkaflixMovieAlias({
   params,
 }: {
   params: Promise<{ id: string }>;

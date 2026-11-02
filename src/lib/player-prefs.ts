@@ -14,7 +14,7 @@ export interface PlayerPrefs {
   subtitleBg: boolean;
 }
 
-const KEY = "dulo_player_prefs_v1";
+const KEY = "arkaflix_player_prefs_v1";
 
 export const SUBTITLE_LANGUAGES = [
   { code: "off", label: "Off" },

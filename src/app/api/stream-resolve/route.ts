@@ -72,7 +72,7 @@ interface EngineDef {
 export const STREAM_ENGINES: EngineDef[] = [
   {
     id: "megavid-sub",
-    provider: "Anime · Sub",
+    provider: "Anime Sub",
     label: "Anime (Japanese audio + subs)",
     host: "megavid.buzz",
     tier: 0,
@@ -85,7 +85,7 @@ export const STREAM_ENGINES: EngineDef[] = [
   },
   {
     id: "megavid-dub",
-    provider: "Anime · Dub",
+    provider: "Anime Dub",
     label: "Anime (English dub)",
     host: "megavid.buzz",
     tier: 1,
@@ -93,6 +93,53 @@ export const STREAM_ENGINES: EngineDef[] = [
     qualityTag: "Anime · English Dub",
     allowUnverified: true,
     anime: (alId, ep) => `https://megavid.buzz/ani/${alId}/${ep}/dub`,
+  },
+  {
+    id: "shinobi-dub",
+    provider: "Shinobi Dub",
+    label: "Shinobi Dub",
+    host: "6azt0hwr-cf9.workers.dev",
+    tier: 1,
+    timeoutMs: 5000,
+    qualityTag: "Shinobi · English Dub 1080p",
+    allowUnverified: true,
+    // Same resolver family dulo.mov uses; dub renders are built on demand.
+    anime: (alId, ep) =>
+      `https://zcdn1.6azt0hwr-cf9.workers.dev/cdn?anilist=${alId}&type=tv&episode=${ep}&lang=dub&provider=shinobi`,
+    tv: (tmdbId, season, episode) =>
+      `https://zcdn1.6azt0hwr-cf9.workers.dev/cdn?tmdb=${tmdbId}&type=tv&season=${season}&episode=${episode}&lang=dub&provider=shinobi`,
+  },
+  {
+    id: "kaa-dub",
+    provider: "KAA Dub",
+    label: "KAA Dub",
+    host: "6azt0hwr-cf9.workers.dev",
+    tier: 2,
+    timeoutMs: 5000,
+    qualityTag: "KAA · English Dub 1080p",
+    allowUnverified: true,
+    anime: (alId, ep) =>
+      `https://zcdn2.6azt0hwr-cf9.workers.dev/cdn?anilist=${alId}&type=tv&episode=${ep}&lang=dub&provider=kaa`,
+    tv: (tmdbId, season, episode) =>
+      `https://zcdn2.6azt0hwr-cf9.workers.dev/cdn?tmdb=${tmdbId}&type=tv&season=${season}&episode=${episode}&lang=dub&provider=kaa`,
+  },
+  {
+    id: "prime",
+    provider: "Prime",
+    label: "Prime",
+    host: "primevideo.com",
+    tier: 4,
+    timeoutMs: 4200,
+    qualityTag: "Prime · 1080p",
+    allowUnverified: true,
+    // Dulo exposes a "Prime" source; Amazon's own player cannot be framed, so
+    // this resolves through the same aggregator relay the other engines use.
+    movie: (id) =>
+      `https://vidlink.pro/movie/${id}?autoplay=true&primaryColor=e02020&secondaryColor=0b0b0f&iconColor=ffffff&provider=prime`,
+    anime: (alId, ep, lang) =>
+      `https://vidlink.pro/anime/${alId}/${ep}/${lang}?autoplay=true&primaryColor=e02020&secondaryColor=0b0b0f`,
+    tv: (id, s, e) =>
+      `https://vidlink.pro/tv/${id}/${s}/${e}?autoplay=true&primaryColor=e02020&secondaryColor=0b0b0f&nextbutton=true&provider=prime`,
   },
   {
     id: "vidpro",
@@ -400,7 +447,7 @@ export async function GET(req: NextRequest) {
   const useAnimeEngines = isAnime && Number.isFinite(anilistId) && anilistId > 0;
 
   /**
-   * Cobalt first — this is the resolver dulo.mov's own player ("Cobalt") uses.
+   * Cobalt first — this is the resolver arkaflix.app's own player ("Cobalt") uses.
    * It hands back a signed master.m3u8 (4K/1080p/720p/480p) that we play
    * natively, which is also the only way to get real quality/audio menus.
    * If the upstream queue is busy or refuses us we fall straight through to

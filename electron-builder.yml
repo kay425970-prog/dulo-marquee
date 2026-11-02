@@ -1,14 +1,14 @@
-appId: app.dulo.marquee
-productName: dulo
-copyright: Copyright © 2026 dulo
+appId: app.arkaflix.marquee
+productName: arkaflix
+copyright: Copyright © 2026 arkaflix
 
 # The web app's package.json is private and version-less (it runs on Netlify),
 # so inject the desktop metadata here rather than mutating it.
 extraMetadata:
   version: 1.0.0
-  description: "dulo — watch movies, shows, anime and live TV"
+  description: "arkaflix — watch movies, shows, anime and live TV"
   author:
-    name: dulo
+    name: arkaflix
     email: kay425970@gmail.com
   main: electron/main.cjs
 
@@ -31,7 +31,7 @@ win:
     - target: portable
       arch: [x64]
   icon: electron/build/icon.ico
-  artifactName: dulo-${version}-${arch}.${ext}
+  artifactName: arkaflix-${version}-${arch}.${ext}
 
 nsis:
   oneClick: false
@@ -39,13 +39,13 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: dulo
+  shortcutName: arkaflix
   installerIcon: electron/build/icon.ico
   uninstallerIcon: electron/build/icon.ico
   deleteAppDataOnUninstall: false
 
 portable:
-  artifactName: dulo-${version}-portable.${ext}
+  artifactName: arkaflix-${version}-portable.${ext}
 
 # Bonus targets so "all devices" is covered, not just Windows.
 linux:
@@ -53,11 +53,11 @@ linux:
     - AppImage
   category: AudioVideo
   icon: electron/build/icon.png
-  artifactName: dulo-${version}-${arch}.${ext}
+  artifactName: arkaflix-${version}-${arch}.${ext}
 
 mac:
   target:
     - dmg
   category: public.app-category.entertainment
   icon: electron/build/icon.png
-  artifactName: dulo-${version}-${arch}.${ext}
+  artifactName: arkaflix-${version}-${arch}.${ext}

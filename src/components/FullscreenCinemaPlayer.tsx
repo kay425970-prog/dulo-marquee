@@ -6,6 +6,7 @@ import type { ResolvedStreamOption } from "@/app/api/stream-resolve/route";
 import { TvPicker } from "./TvPicker";
 import { SubtitleOverlay } from "./SubtitleOverlay";
 import { HlsVideoPlayer } from "./HlsVideoPlayer";
+import { PlayerSettingsPanel } from "./PlayerSettingsPanel";
 import {
   ArrowLeft,
   Maximize2,
@@ -20,6 +21,7 @@ import {
   Server,
   Captions,
   Scan,
+  Settings,
   X,
 } from "lucide-react";
 import {
@@ -97,6 +99,12 @@ export function FullscreenCinemaPlayer({
   const [subtitleLoading, setSubtitleLoading] = useState(false);
   const [subtitleNotice, setSubtitleNotice] = useState<string | null>(null);
   const [subOffset, setSubOffset] = useState(0);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [speed, setSpeed] = useState("Normal");
+  const [volumeBoost, setVolumeBoost] = useState("Off");
+  const [skipIntro, setSkipIntro] = useState(true);
+  const [skipCredits, setSkipCredits] = useState(true);
+  const [qualityPref, setQualityPref] = useState("Auto");
   const savedSeconds = 0;
 
   useEffect(() => {
@@ -248,6 +256,10 @@ export function FullscreenCinemaPlayer({
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        if (settingsOpen) {
+          setSettingsOpen(false);
+          return;
+        }
         if (episodesDrawerOpen) {
           setEpisodesDrawerOpen(false);
         } else if (partyDrawerOpen) {
@@ -259,18 +271,18 @@ export function FullscreenCinemaPlayer({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, episodesDrawerOpen, partyDrawerOpen, handleExitPlayer]);
+  }, [open, episodesDrawerOpen, partyDrawerOpen, settingsOpen, handleExitPlayer]);
 
   // Auto-hide HUD after 3s of pointer inactivity
   const revealHud = useCallback(() => {
     setHudVisible(true);
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     hideTimerRef.current = setTimeout(() => {
-      if (!episodesDrawerOpen && !partyDrawerOpen) {
+      if (!episodesDrawerOpen && !partyDrawerOpen && !settingsOpen) {
         setHudVisible(false);
       }
     }, 3000);
-  }, [episodesDrawerOpen, partyDrawerOpen]);
+  }, [episodesDrawerOpen, partyDrawerOpen, settingsOpen]);
 
   useEffect(() => {
     if (open) revealHud();
@@ -417,7 +429,7 @@ export function FullscreenCinemaPlayer({
       onTouchStart={revealHud}
       className="fixed inset-0 z-[250] flex h-screen w-screen flex-col overflow-hidden bg-black select-none"
     >
-      {/* DULO.MOV TRANSLUCENT AUTO-HIDING FULLSCREEN HUD */}
+      {/* ARKAFLIX.MOV TRANSLUCENT AUTO-HIDING FULLSCREEN HUD */}
       <div
         className={`absolute inset-x-0 top-0 z-30 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-b from-black/90 via-black/55 to-transparent px-4 pb-8 pt-4 transition-opacity duration-300 sm:px-7 ${
           hudVisible || episodesDrawerOpen || partyDrawerOpen
@@ -670,6 +682,21 @@ export function FullscreenCinemaPlayer({
 
           <button
             type="button"
+            onClick={() => setSettingsOpen((v) => !v)}
+            title="Player settings"
+            aria-label="Player settings"
+            className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 backdrop-blur-2xl transition ${
+              settingsOpen
+                ? "bg-[#e02020] text-white ring-[#e02020]"
+                : "bg-[#0d0d0d]/80 text-white ring-white/[0.1] hover:bg-white/[0.14]"
+            }`}
+          >
+            <Settings className="h-3.5 w-3.5" />
+            <span>Settings</span>
+          </button>
+
+          <button
+            type="button"
             onClick={toggleNativeFullscreen}
             title={isNativeFullscreen ? "Exit Fullscreen" : "Fullscreen"}
             className="grid h-10 w-10 place-items-center rounded-full bg-[#0d0d0d]/80 text-white ring-1 ring-white/[0.1] backdrop-blur-2xl transition hover:bg-white/[0.14]"
@@ -690,6 +717,44 @@ export function FullscreenCinemaPlayer({
             <X className="h-4 w-4" />
           </button>
       </div>
+
+      <PlayerSettingsPanel
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        streams={streams}
+        streamIndex={streamIndex}
+        onSelectStream={(i) => {
+          setStreamIndex(i);
+          setManualStream(true);
+          setIframeLoaded(false);
+        }}
+        quality={qualityPref}
+        qualities={["Auto", "4K", "1080p", "720p", "480p"]}
+        onSelectQuality={setQualityPref}
+        audioLabel={activeStream?.provider?.toLowerCase().includes("dub") ? "English" : "Original"}
+        audioOptions={["Original", "English"]}
+        onSelectAudio={() => {}}
+        subtitleLabel={prefs.subtitleLang === "off" ? "Off" : (SUBTITLE_LANGUAGES.find((l) => l.code === prefs.subtitleLang)?.label ?? "English")}
+        subtitleOptions={SUBTITLE_LANGUAGES.filter((l) => l.code !== "off").map((l) => l.label)}
+        onSelectSubtitle={(label) => {
+          const match = SUBTITLE_LANGUAGES.find((l) => l.label === label);
+          if (match) updatePrefs({ subtitleLang: match.code });
+        }}
+        speed={speed}
+        speedOptions={["Normal", "1.25x", "1.5x", "2x", "0.75x"]}
+        onSelectSpeed={setSpeed}
+        volumeBoost={volumeBoost}
+        volumeBoostOptions={["Off", "100%", "200%", "300%"]}
+        onSelectVolumeBoost={setVolumeBoost}
+        skipIntro={skipIntro}
+        onToggleSkipIntro={() => setSkipIntro((v) => !v)}
+        skipCredits={skipCredits}
+        onToggleSkipCredits={() => setSkipCredits((v) => !v)}
+        pictureSize={prefs.fitMode === "cover" ? "fill" : "fit"}
+        onTogglePictureSize={() =>
+          updatePrefs({ fitMode: prefs.fitMode === "cover" ? "contain" : "cover" })
+        }
+      />
 
       {/* FULLSCREEN STREAMING IFRAME STAGE */}
       <div className="relative flex h-full w-full flex-1 items-center justify-center overflow-hidden bg-black">

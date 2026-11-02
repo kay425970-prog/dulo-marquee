@@ -114,7 +114,7 @@ export default function HomePage() {
 
   return (
     <main className="pb-16">
-      {/* DULO.MOV EXACT HERO STAGE (.beta-hero-stage) */}
+      {/* ARKAFLIX.MOV EXACT HERO STAGE (.beta-hero-stage) */}
       <div className="beta-hero-stage relative isolate">
         <div
           aria-hidden="true"
@@ -135,11 +135,11 @@ export default function HomePage() {
 
           <div className="beta-hero-shade absolute inset-0 bg-gradient-to-r from-black via-black/70 to-black/25 sm:via-black/60 sm:to-transparent" />
 
-          <div className="dulo-rail-px relative z-10 mx-auto flex min-h-[max(520px,68svh)] w-full flex-col justify-end pb-14 pt-24 sm:min-h-[max(560px,74svh)] sm:pb-20">
+          <div className="arkaflix-rail-px relative z-10 mx-auto flex min-h-[max(520px,68svh)] w-full flex-col justify-end pb-14 pt-24 sm:min-h-[max(560px,74svh)] sm:pb-20">
             <div className="max-w-2xl">
               <p className="text-[10px] font-light italic tracking-[0.25em] text-white/80 text-shadow-hero sm:text-[11px] sm:tracking-[0.3em]">
                 <span className="font-semibold not-italic tracking-[0.35em] sm:tracking-[0.4em]">
-                  DULO
+                  ARKAFLIX
                 </span>
               </p>
 
@@ -180,7 +180,7 @@ export default function HomePage() {
                 {currentHero.overview}
               </p>
 
-              {/* dulo.mov Hero Action Buttons */}
+              {/* arkaflix.app Hero Action Buttons */}
               <div data-tv-row="hero-actions" className="mt-5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3">
                 <Link
                   href={`/title/${currentHero.type}/${currentHero.id}?play=1`}
@@ -202,7 +202,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* dulo.mov Bottom Centered Slide Tab Dots (Crimson active glow) */}
+          {/* arkaflix.app Bottom Centered Slide Tab Dots (Crimson active glow) */}
           {heroList.length > 1 && (
             <div
               role="tablist"
@@ -236,12 +236,12 @@ export default function HomePage() {
         </section>
       </div>
 
-      {/* DULO.MOV RAILS STACK */}
+      {/* ARKAFLIX.MOV RAILS STACK */}
       <div className="relative z-10 space-y-9 pt-4 sm:space-y-11">
         {/* CONTINUE WATCHING RAIL */}
         {continueWatching.length > 0 && (
           <section aria-label="Continue watching" data-tv-row="continue-watching">
-            <div className="dulo-rail-px mb-3 flex items-end justify-between">
+            <div className="arkaflix-rail-px mb-3 flex items-end justify-between">
               <h2 className="text-[17px] font-semibold leading-none text-white/[0.92] sm:text-[19px]">
                 Continue Watching
               </h2>
@@ -249,11 +249,11 @@ export default function HomePage() {
                 href="/my"
                 className="text-xs font-semibold text-white/55 hover:text-white"
               >
-                Your Dulo
+                Your Arkaflix
               </Link>
             </div>
 
-            <div data-tv-rail className="scrollbar-hide dulo-rail-px flex gap-4 overflow-x-auto pb-4 pt-1">
+            <div data-tv-rail className="scrollbar-hide arkaflix-rail-px flex gap-4 overflow-x-auto pb-4 pt-1">
               {continueWatching.map((entry) => (
                 <div
                   key={entry.id}
@@ -303,13 +303,13 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* DULO.MOV CHANNELS & APPS RAIL (.beta-provider-rail + .beta-service-card) */}
+        {/* ARKAFLIX.MOV CHANNELS & APPS RAIL (.beta-provider-rail + .beta-service-card) */}
         <section
           aria-labelledby="channels-apps-heading"
           data-tv-row="channels-apps"
           className="beta-provider-rail relative min-w-0"
         >
-          <div className="dulo-rail-px mb-3 flex items-end justify-between gap-4">
+          <div className="arkaflix-rail-px mb-3 flex items-end justify-between gap-4">
             <div>
               <h2
                 id="channels-apps-heading"
@@ -329,7 +329,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div data-tv-rail className="scrollbar-hide dulo-rail-px flex snap-x snap-proximity gap-3 overflow-x-auto pb-5 pt-1.5">
+          <div data-tv-rail className="scrollbar-hide arkaflix-rail-px flex snap-x snap-proximity gap-3 overflow-x-auto pb-5 pt-1.5">
             {PROVIDERS.filter((p) => p.type !== "store").map((prov) => (
               <Link
                 key={prov.id}
@@ -372,7 +372,7 @@ export default function HomePage() {
           landscape
         />
 
-        {/* DULO.MOV TOP 10 TV SHOWS */}
+        {/* ARKAFLIX.MOV TOP 10 TV SHOWS */}
         <MediaRail
           title="Top 10 TV Shows"
           href="/shows"
@@ -380,7 +380,7 @@ export default function HomePage() {
           ranked
         />
 
-        {/* DULO.MOV TOP 10 MOVIES */}
+        {/* ARKAFLIX.MOV TOP 10 MOVIES */}
         <MediaRail
           title="Top 10 Movies"
           href="/movies"

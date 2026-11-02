@@ -291,7 +291,7 @@ function MyLibraryContent() {
   const handleExportWatchlist = (format: "json" | "markdown") => {
     if (format === "markdown") {
       const lines = [
-        `# ${activeProfile?.name || "dulo"} — My List`,
+        `# ${activeProfile?.name || "arkaflix"} — My List`,
         "",
         ...library.map(
           (i) =>
@@ -317,14 +317,14 @@ function MyLibraryContent() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `dulo-mylist-${activeProfile?.handle || "export"}.json`;
+    a.download = `arkaflix-mylist-${activeProfile?.handle || "export"}.json`;
     a.click();
     URL.revokeObjectURL(url);
     notify("Downloaded OpenWatchlist JSON");
   };
 
   return (
-    <main className="dulo-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
+    <main className="arkaflix-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
       {/* Profile Header */}
       <div className="beta-panel flex flex-col justify-between gap-5 p-6 md:flex-row md:items-center">
         <div className="flex items-center gap-4">
@@ -333,7 +333,7 @@ function MyLibraryContent() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">
-              {activeProfile?.name || "Your Dulo"}
+              {activeProfile?.name || "Your Arkaflix"}
             </h1>
             <p className="text-xs text-white/55">
               {activeProfile?.bio ||

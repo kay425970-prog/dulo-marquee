@@ -5,7 +5,7 @@ conflict — each host reads only its own file.
 
 | | Netlify (live) | Vercel |
 | --- | --- | --- |
-| Web app | https://dulo-marquee.netlify.app | created on first import |
+| Web app | https://arkaflix.netlify.app | created on first import |
 | Runtime | `@netlify/plugin-nextjs` | built-in Next.js |
 | DB env var | `NETLIFY_DATABASE_URL` (auto) | `DATABASE_URL` or `POSTGRES_URL` |
 | Headers | `netlify.toml` | `vercel.json` |
@@ -14,7 +14,7 @@ conflict — each host reads only its own file.
 
 ## 1. Import the repo
 
-https://vercel.com/new/clone?repository-url=https://github.com/kay425970-prog/dulo-marquee
+https://vercel.com/new/clone?repository-url=https://github.com/kay425970-prog/arkaflix
 
 - Framework: **Next.js** (auto-detected; `vercel.json` makes it explicit)
 - Build command: `npm run build` (default)

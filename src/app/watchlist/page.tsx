@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function DuloWatchlistAlias() {
+export default function ArkaflixWatchlistAlias() {
   redirect("/my");
 }

@@ -1,16 +1,16 @@
 /**
- * dulo desktop shell (Electron) — wraps the live app so it installs like a
+ * arkaflix desktop shell (Electron) — wraps the live app so it installs like a
  * native Windows app with its own icon, taskbar entry and fullscreen mode.
  *
  * Loads the deployed web app by default (the site is server-rendered with API
  * routes + Postgres, so it cannot be bundled as static files). Point it at a
- * local dev server with:  DULO_URL=http://localhost:3000 npm run electron:dev
+ * local dev server with:  ARKAFLIX_URL=http://localhost:3000 npm run electron:dev
  */
 const { app, BrowserWindow, shell, Menu, globalShortcut } = require("electron");
 
 const APP_URL =
-  process.env.DULO_URL || "https://dulo-marquee.netlify.app";
-const isTVMode = process.argv.includes("--tv") || process.env.DULO_TV === "1";
+  process.env.ARKAFLIX_URL || "https://arkaflix.netlify.app";
+const isTVMode = process.argv.includes("--tv") || process.env.ARKAFLIX_TV === "1";
 
 if (process.env.NODE_ENV !== "production") {
   process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
@@ -29,7 +29,7 @@ function createWindow() {
     fullscreen: isTVMode,
     kiosk: isTVMode,
     autoHideMenuBar: true,
-    title: "dulo",
+    title: "arkaflix",
     icon: require("path").join(__dirname, "build", "icon.png"),
     webPreferences: {
       contextIsolation: true,

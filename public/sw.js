@@ -1,11 +1,11 @@
-/* dulo service worker — offline shell + fast repeat loads.
+/* arkaflix service worker — offline shell + fast repeat loads.
  * Strategy:
  *  - Navigations: network-first, fall back to cached page, then /offline.html
  *  - Static build assets & icons: cache-first (immutable, hashed)
  *  - TMDB artwork: stale-while-revalidate
  *  - /api/*: always network (never cached — fresh data matters)
  */
-const VERSION = "dulo-v1";
+const VERSION = "arkaflix-v1";
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const IMAGE_CACHE = `${VERSION}-images`;

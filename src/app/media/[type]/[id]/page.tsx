@@ -52,7 +52,7 @@ interface ReviewRow {
   createdAt: string;
 }
 
-export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
+export function ArkaflixTitleInfoView({ type, id }: { type: string; id: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const {
@@ -352,14 +352,14 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
         body: JSON.stringify({
           mediaId: item.id,
           mediaType: item.type,
-          profileName: activeProfile?.name || "dulo Member",
+          profileName: activeProfile?.name || "arkaflix Member",
           avatarGradient:
             activeProfile?.avatarGradient || "from-red-600 to-rose-700",
           rating: userScore,
           headline: `Rated ${userScore}/10`,
           comment:
             ratingNote.trim() ||
-            `Rated ${item.title} ${userScore}/10 on dulo.`,
+            `Rated ${item.title} ${userScore}/10 on arkaflix.`,
         }),
       });
       if (res.ok) {
@@ -500,7 +500,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
         }}
       />
 
-      {/* DULO.MOV EXACT TITLE HERO SECTION (node 23) */}
+      {/* ARKAFLIX.MOV EXACT TITLE HERO SECTION (node 23) */}
       <section className="relative flex min-h-[560px] w-full flex-col justify-end overflow-hidden bg-[#070707] sm:h-[min(78svh,750px)]">
         <img
           src={item.backdropUrl || item.posterUrl}
@@ -509,7 +509,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
           className="absolute inset-0 h-full w-full object-cover object-[65%_18%] opacity-80"
         />
 
-        {/* dulo.mov exact layered gradients */}
+        {/* arkaflix.app exact layered gradients */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/[0.86] via-black/[0.45] to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_72%_52%_at_52%_-8%,rgba(255,193,106,0.18),transparent_58%)]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/25 to-transparent" />
@@ -525,7 +525,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
         </button>
 
         {/* Hero Foreground Content */}
-        <div className="dulo-rail-px relative z-10 pb-10 pt-32 sm:pb-14">
+        <div className="arkaflix-rail-px relative z-10 pb-10 pt-32 sm:pb-14">
           <div className="max-w-[640px]">
             {item.logoUrl ? (
               <>
@@ -585,7 +585,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
               </p>
             )}
 
-            {/* DULO.MOV ACTION BAR: PLAY OPENS FULLSCREEN PLAYER */}
+            {/* ARKAFLIX.MOV ACTION BAR: PLAY OPENS FULLSCREEN PLAYER */}
             <div className="mt-6 flex flex-wrap items-center gap-2.5">
               <button
                 type="button"
@@ -674,11 +674,11 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
         </div>
       </section>
 
-      {/* BELOW-HERO SECTIONS (dulo.mov exact spacing & components) */}
+      {/* BELOW-HERO SECTIONS (arkaflix.app exact spacing & components) */}
       <div className="relative z-10 space-y-12 pt-4">
-        {/* INLINE COLLECTION OR RATING PANEL (dulo.mov exact glass card) */}
+        {/* INLINE COLLECTION OR RATING PANEL (arkaflix.app exact glass card) */}
         {activePanel !== "none" && (
-          <section className="dulo-rail-px">
+          <section className="arkaflix-rail-px">
             <div className="max-w-3xl rounded-[22px] border border-white/[0.09] bg-white/[0.045] p-5 shadow-2xl backdrop-blur-xl">
               {activePanel === "collect" ? (
                 <>
@@ -797,11 +797,11 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
           </section>
         )}
 
-        {/* DULO.MOV "AVAILABLE ON THESE" PROVIDER PILLS */}
+        {/* ARKAFLIX.MOV "AVAILABLE ON THESE" PROVIDER PILLS */}
         {availabilityGroups.length > 0 && (
           <section
             aria-labelledby="availability-heading"
-            className="dulo-rail-px"
+            className="arkaflix-rail-px"
           >
             <div>
               <h2
@@ -811,7 +811,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
                 Available on these
               </h2>
               <p className="mt-1 text-[12px] font-medium text-white/50">
-                US availability · Select a service to browse its dulo catalog
+                US availability · Select a service to browse its arkaflix catalog
               </p>
             </div>
 
@@ -866,9 +866,9 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
           </section>
         )}
 
-        {/* DULO.MOV EPISODES GRID WITH TMDB w300 STILLS & SPOILER SHIELD */}
+        {/* ARKAFLIX.MOV EPISODES GRID WITH TMDB w300 STILLS & SPOILER SHIELD */}
         {isEpisodic && item.seasons && activeSeasonObj && (
-          <section className="dulo-rail-px">
+          <section className="arkaflix-rail-px">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="flex flex-wrap items-center gap-2.5">
@@ -1010,9 +1010,9 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
           </section>
         )}
 
-        {/* DULO.MOV CIRCULAR CAST ROW */}
+        {/* ARKAFLIX.MOV CIRCULAR CAST ROW */}
         {item.cast.length > 0 && (
-          <section className="dulo-rail-px">
+          <section className="arkaflix-rail-px">
             <h2 className="mb-3 text-[16px] font-semibold text-white/[0.92] sm:text-[17px]">
               Cast
             </h2>
@@ -1049,11 +1049,11 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
           </section>
         )}
 
-        {/* DULO.MOV AUDIENCE REVIEWS (PostgreSQL + TMDB Excerpts) */}
+        {/* ARKAFLIX.MOV AUDIENCE REVIEWS (PostgreSQL + TMDB Excerpts) */}
         {(reviews.length > 0 || (item.tmdbReviews?.length || 0) > 0) && (
           <section
             aria-labelledby="reviews-heading"
-            className="dulo-rail-px"
+            className="arkaflix-rail-px"
           >
             <div className="mb-4 flex items-end justify-between gap-3">
               <div>
@@ -1096,7 +1096,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
                   </p>
                   <div className="mt-4 flex items-center justify-between">
                     <span className="text-[11px] text-white/35">
-                      dulo Member
+                      arkaflix Member
                     </span>
                     <button
                       type="button"
@@ -1160,7 +1160,7 @@ export default function MediaDetailPage({
         </div>
       }
     >
-      <DuloTitleInfoView type={type} id={id} />
+      <ArkaflixTitleInfoView type={type} id={id} />
     </Suspense>
   );
 }

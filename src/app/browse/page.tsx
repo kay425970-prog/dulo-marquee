@@ -12,7 +12,7 @@ import { useMarquee } from "@/components/MarqueeProvider";
 import { MediaCard } from "@/components/MediaCard";
 import { Search, X, Loader2, RefreshCw } from "lucide-react";
 
-export function DuloShelfBrowser({
+export function ArkaflixShelfBrowser({
   defaultMedia = "all",
 }: {
   defaultMedia?: "all" | "movie" | "tv" | "anime";
@@ -180,9 +180,9 @@ export function DuloShelfBrowser({
           : "Discover";
 
   return (
-    <main className="dulo-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
+    <main className="arkaflix-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
-        {/* DULO.MOV LEFT SHELF SIDEBAR (D5wYSRv4.js) */}
+        {/* ARKAFLIX.MOV LEFT SHELF SIDEBAR (D5wYSRv4.js) */}
         <aside className="hidden space-y-7 lg:block">
           <div>
             <p className="mb-2 px-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/[0.38]">
@@ -392,7 +392,7 @@ export default function BrowsePage() {
         </div>
       }
     >
-      <DuloShelfBrowser defaultMedia="all" />
+      <ArkaflixShelfBrowser defaultMedia="all" />
     </Suspense>
   );
 }

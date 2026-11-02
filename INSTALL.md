@@ -1,6 +1,6 @@
-# Install dulo everywhere
+# Install arkaflix everywhere
 
-The app is deployed at **https://dulo-marquee.netlify.app**.
+The app is deployed at **https://arkaflix.netlify.app**.
 
 Because it's server-rendered (Next.js API routes + Postgres), the phone/desktop
 builds act as a **native shell** that loads the deployed app — that's how it
@@ -12,7 +12,7 @@ gets a real icon, its own window, fullscreen, and no browser chrome.
 
 ### Get the APK
 1. GitHub → **Actions** → **Build Android APK (phone + Android TV)** → **Run workflow**
-2. Wait ~8 min → open the finished run → download **`dulo-android-apk`**
+2. Wait ~8 min → open the finished run → download **`arkaflix-android-apk`**
 3. Unzip → `app-debug.apk`
 
 > First run of the `android` workflow after a push also triggers automatically.
@@ -20,7 +20,7 @@ gets a real icon, its own window, fullscreen, and no browser chrome.
 ### Install on a phone
 1. Copy the APK to the device (USB, Drive, Telegram…)
 2. Tap it → allow **Install unknown apps** for your file manager
-3. Open **dulo**
+3. Open **arkaflix**
 
 ### Install on Android TV / Vitron
 The APK declares `LEANBACK_LAUNCHER`, a TV banner,
@@ -37,7 +37,7 @@ row and installs on TVs without a touchscreen.
 ```bash
 adb connect <TV_IP>:5555       # enable Developer options → USB debugging / ADB on the TV
 adb install -r app-debug.apk
-adb shell monkey -p app.dulo.marquee -c android.intent.category.LEANBACK_LAUNCHER 1
+adb shell monkey -p app.arkaflix.marquee -c android.intent.category.LEANBACK_LAUNCHER 1
 ```
 
 **USB drive:** copy the APK to a USB stick → plug into the TV → use a file
@@ -60,10 +60,10 @@ whenever the app runs installed. Force it manually with `?tv=1`, disable with
 ## 🪟 Windows (.exe)
 
 1. GitHub → **Actions** → **Build Windows EXE (+ Linux AppImage)** → **Run workflow**
-2. Download **`dulo-windows-exe`**
+2. Download **`arkaflix-windows-exe`**
 3. You get:
-   - `dulo-1.0.0-x64.exe` — NSIS installer (desktop + Start Menu shortcut)
-   - `dulo-1.0.0-portable.exe` — single-file portable, no install
+   - `arkaflix-1.0.0-x64.exe` — NSIS installer (desktop + Start Menu shortcut)
+   - `arkaflix-1.0.0-portable.exe` — single-file portable, no install
 
 Unsigned build → Windows SmartScreen may warn. **More info → Run anyway**, or
 sign it with a code-signing certificate by setting `CSC_LINK` / `CSC_KEY_PASSWORD`.
@@ -75,7 +75,7 @@ toggle fullscreen.
 
 ## 🍎 macOS / 🐧 Linux
 
-`windows-exe.yml` also builds a Linux **AppImage** (`dulo-<version>-x64.AppImage`,
+`windows-exe.yml` also builds a Linux **AppImage** (`arkaflix-<version>-x64.AppImage`,
 `chmod +x` then run). For macOS run locally:
 
 ```bash
@@ -117,7 +117,7 @@ cd android && ./gradlew assembleDebug
 npm ci
 npm install --no-save electron@32 electron-builder@25
 npx electron-builder --win --publish never
-# → dist/dulo-1.0.0-x64.exe
+# → dist/arkaflix-1.0.0-x64.exe
 ```
 
 ---
@@ -127,6 +127,6 @@ npx electron-builder --win --publish never
 - The native shells load the **live** site, so web deploys update the apps
   instantly — no store review, no reinstall.
 - To point a shell at a different host: edit `server.url` in
-  `capacitor.config.json` (mobile) or set `DULO_URL` (desktop).
+  `capacitor.config.json` (mobile) or set `ARKAFLIX_URL` (desktop).
 - Portraits, playback and Live TV all stream client-side; no media is bundled in
   the app.

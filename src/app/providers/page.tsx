@@ -65,7 +65,7 @@ function ProvidersContent() {
   }, [liveServiceItems, activeProvider]);
 
   return (
-    <main className="dulo-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
+    <main className="arkaflix-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
@@ -81,7 +81,7 @@ function ProvidersContent() {
         </span>
       </div>
 
-      {/* DULO.MOV SERVICE CARDS GRID (.beta-service-card) */}
+      {/* ARKAFLIX.MOV SERVICE CARDS GRID (.beta-service-card) */}
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
         {PROVIDERS.filter((p) => p.type !== "store").map((prov) => {
           const isSelected = prov.id === activeProvider.id;

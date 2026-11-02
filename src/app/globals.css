@@ -54,37 +54,37 @@ body {
   outline-offset: 3px;
 }
 
-/* dulo.mov Section Horizontal Padding */
-.dulo-rail-px {
+/* arkaflix Section Horizontal Padding */
+.arkaflix-rail-px {
   padding-inline: 1.25rem;
 }
 @media (min-width: 640px) {
-  .dulo-rail-px {
+  .arkaflix-rail-px {
     padding-inline: 2rem;
   }
 }
 @media (min-width: 768px) {
-  .dulo-rail-px {
+  .arkaflix-rail-px {
     padding-inline: 3rem;
   }
 }
 @media (min-width: 1024px) {
-  .dulo-rail-px {
+  .arkaflix-rail-px {
     padding-inline: 3.5rem;
   }
 }
 @media (min-width: 1280px) {
-  .dulo-rail-px {
+  .arkaflix-rail-px {
     padding-inline: 4rem;
   }
 }
 @media (min-width: 1536px) {
-  .dulo-rail-px {
+  .arkaflix-rail-px {
     padding-inline: 5rem;
   }
 }
 
-/* dulo.mov Hero Image Bottom Mask & Ambient Bleed */
+/* arkaflix Hero Image Bottom Mask & Ambient Bleed */
 .beta-hero-image,
 .beta-hero-shade {
   -webkit-mask-image: linear-gradient(#000 0% 62%, transparent 100%);
@@ -112,7 +112,7 @@ body {
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.72);
 }
 
-/* dulo.mov Action Buttons */
+/* arkaflix Action Buttons */
 .beta-action {
   border: 1px solid var(--beta-border);
   border-radius: 16px;
@@ -132,7 +132,7 @@ body {
   transform: scale(0.98);
 }
 
-/* dulo.mov Floating Sidebar */
+/* arkaflix Floating Sidebar */
 .beta-sidebar {
   border: 1px solid var(--beta-border-strong);
   background: var(--color-sidebar);
@@ -154,7 +154,7 @@ body {
   color: #fff;
 }
 
-/* dulo.mov Mobile Header & Bottom Dock */
+/* arkaflix Mobile Header & Bottom Dock */
 .beta-mobile-header {
   background: linear-gradient(
     180deg,
@@ -186,7 +186,7 @@ body {
   top: 0;
 }
 
-/* dulo.mov Channels & Apps Service Cards */
+/* arkaflix Channels & Apps Service Cards */
 .beta-provider-rail {
   isolation: isolate;
 }
@@ -250,7 +250,7 @@ body {
   transform: translateY(-3px);
 }
 
-/* dulo.mov Top 10 Ranked Hollow Stroke Numbers */
+/* arkaflix Top 10 Ranked Hollow Stroke Numbers */
 .top-rank-number {
   color: transparent;
   -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.72);
@@ -276,7 +276,7 @@ body {
   mask-image: none;
 }
 
-/* dulo.mov Panels & Search Field */
+/* arkaflix Panels & Search Field */
 .beta-panel {
   border: 1px solid var(--beta-border);
   background: var(--beta-surface);
@@ -416,11 +416,11 @@ video::cue {
 }
 
 /* Poster cards: surface the hover overlay + action buttons on focus */
-.tv-mode [data-rail-card]:focus-within .dulo-card-overlay,
-.tv-mode a:focus .dulo-card-overlay,
-.tv-mode [data-tv-row] a:focus .dulo-card-overlay,
-.tv-mode [data-tv-row] button:focus .dulo-card-overlay,
-.tv-mode .group:has(> a:focus) .dulo-card-overlay {
+.tv-mode [data-rail-card]:focus-within .arkaflix-card-overlay,
+.tv-mode a:focus .arkaflix-card-overlay,
+.tv-mode [data-tv-row] a:focus .arkaflix-card-overlay,
+.tv-mode [data-tv-row] button:focus .arkaflix-card-overlay,
+.tv-mode .group:has(> a:focus) .arkaflix-card-overlay {
   opacity: 1 !important;
 }
 
@@ -480,4 +480,20 @@ html.tv-mode {
 .tv-mode [data-tv-row] button {
   transition: transform 0.14s ease-out, box-shadow 0.14s ease-out,
     outline-color 0.14s ease-out;
+}
+
+/* dulo.mov-style settings panel scrollbar (thin, subtle) */
+.arkaflix-settings-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+.arkaflix-settings-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.arkaflix-settings-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+}
+.arkaflix-settings-scroll::-webkit-scrollbar-track {
+  background: transparent;
 }

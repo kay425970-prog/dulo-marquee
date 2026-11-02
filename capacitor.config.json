@@ -1,6 +1,6 @@
 {
-  "appId": "app.dulo.marquee",
-  "appName": "dulo",
+  "appId": "app.arkaflix.marquee",
+  "appName": "arkaflix",
   "webDir": "public",
   "bundledWebRuntime": false,
   "android": {
@@ -9,7 +9,7 @@
     "webContentsDebuggingEnabled": false
   },
   "server": {
-    "url": "https://dulo-marquee.netlify.app",
+    "url": "https://arkaflix.netlify.app",
     "androidScheme": "https",
     "cleartext": false
   },

@@ -27,7 +27,7 @@ export function MediaCard({
   const inWatchlist = isInWatchlist(item.id);
   const detailHref = `/title/${item.type}/${item.id}`;
 
-  // DULO.MOV TOP 10 RANKED CARD (.home-rail-ranked)
+  // ARKAFLIX.MOV TOP 10 RANKED CARD (.home-rail-ranked)
   if (rank !== undefined) {
     return (
       <Link
@@ -65,7 +65,7 @@ export function MediaCard({
     );
   }
 
-  // DULO.MOV STANDARD POSTER CARD
+  // ARKAFLIX.MOV STANDARD POSTER CARD
   return (
     <div
       data-rail-card="true"
@@ -179,7 +179,7 @@ export function MediaRail({
         ranked ? "home-rail-ranked" : ""
       }`}
     >
-      <div className="dulo-rail-px mb-3 flex items-end justify-between gap-3">
+      <div className="arkaflix-rail-px mb-3 flex items-end justify-between gap-3">
         <div>
           {eyebrow && (
             <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.03em] text-white/[0.44]">
@@ -222,7 +222,7 @@ export function MediaRail({
       <div
         ref={scrollerRef}
         data-tv-rail
-        className={`scrollbar-hide dulo-rail-px flex snap-x snap-proximity overflow-x-auto pb-6 pt-1.5 ${
+        className={`scrollbar-hide arkaflix-rail-px flex snap-x snap-proximity overflow-x-auto pb-6 pt-1.5 ${
           landscape ? "gap-4 sm:gap-5" : "gap-3 sm:gap-4"
         }`}
       >

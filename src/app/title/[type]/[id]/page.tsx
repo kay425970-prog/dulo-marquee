@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, use } from "react";
-import { DuloTitleInfoView } from "@/app/media/[type]/[id]/page";
+import { ArkaflixTitleInfoView } from "@/app/media/[type]/[id]/page";
 import { Loader2 } from "lucide-react";
 
 export default function TitleDetailPage({
@@ -18,7 +18,7 @@ export default function TitleDetailPage({
         </div>
       }
     >
-      <DuloTitleInfoView type={type} id={id} />
+      <ArkaflixTitleInfoView type={type} id={id} />
     </Suspense>
   );
 }

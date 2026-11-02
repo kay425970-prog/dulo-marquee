@@ -146,7 +146,7 @@ function LiveTvContent() {
   };
 
   return (
-    <main className="dulo-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
+    <main className="arkaflix-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
       <div>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#da1b1b]/20 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#ff8585]">
           <Radio className="h-3 w-3 animate-pulse" /> Live TV

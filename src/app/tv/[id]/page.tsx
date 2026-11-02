@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-export default async function DuloTvAlias({
+export default async function ArkaflixTvAlias({
   params,
 }: {
   params: Promise<{ id: string }>;

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { DuloShelfBrowser } from "@/app/browse/page";
+import { ArkaflixShelfBrowser } from "@/app/browse/page";
 import { Loader2 } from "lucide-react";
 
 export default function ShowsPage() {
@@ -13,7 +13,7 @@ export default function ShowsPage() {
         </div>
       }
     >
-      <DuloShelfBrowser defaultMedia="tv" />
+      <ArkaflixShelfBrowser defaultMedia="tv" />
     </Suspense>
   );
 }

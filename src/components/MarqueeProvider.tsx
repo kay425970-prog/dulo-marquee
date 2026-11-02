@@ -602,7 +602,7 @@ export function MarqueeProvider({ children }: { children: React.ReactNode }) {
     <MarqueeContext.Provider value={value}>
       {children}
 
-      {/* dulo.mov Glass Toast */}
+      {/* arkaflix.app Glass Toast */}
       {toast && (
         <div className="fixed bottom-20 right-5 z-[300] flex items-center gap-2.5 rounded-2xl border border-white/[0.14] bg-[#171717]/95 px-4 py-3 text-[13px] font-semibold text-white shadow-[0_18px_48px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:bottom-6">
           <span className="grid h-5 w-5 place-items-center rounded-full bg-[#da1b1b] text-white">
@@ -612,7 +612,7 @@ export function MarqueeProvider({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* dulo.mov Search Modal (.beta-search-field) */}
+      {/* arkaflix.app Search Modal (.beta-search-field) */}
       {omnibarOpen && (
         <div
           className="fixed inset-0 z-[200] flex items-start justify-center bg-black/80 px-4 pt-20 backdrop-blur-md"
@@ -787,7 +787,7 @@ export function MarqueeProvider({ children }: { children: React.ReactNode }) {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-white">
-                  Who&apos;s watching dulo?
+                  Who&apos;s watching arkaflix?
                 </h3>
                 <p className="mt-0.5 text-xs text-white/50">
                   {user
@@ -872,7 +872,7 @@ export function MarqueeProvider({ children }: { children: React.ReactNode }) {
                       onClick={() => setProfileModalOpen(false)}
                       className="inline-flex h-10 items-center rounded-full bg-white px-4 text-xs font-semibold text-black hover:bg-white/90"
                     >
-                      Your Dulo →
+                      Your Arkaflix →
                     </Link>
                   </div>
                 </div>

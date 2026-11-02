@@ -23,7 +23,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-export function DuloLogoMark({ className = "h-7 w-7" }: { className?: string }) {
+export function ArkaflixLogoMark({ className = "h-7 w-7" }: { className?: string }) {
   return (
     <svg
       viewBox="336 386 368 356"
@@ -102,7 +102,7 @@ export function Navbar() {
     },
     {
       key: "you",
-      label: "Your Dulo",
+      label: "Your Arkaflix",
       href: "/my",
       icon: User,
       active: pathname === "/my",
@@ -311,7 +311,7 @@ export function Navbar() {
 
   return (
     <>
-      {/* DESKTOP FLOATING PILL TOP NAVBAR (dulo.mov exact) */}
+      {/* DESKTOP FLOATING PILL TOP NAVBAR (arkaflix.app exact) */}
       <header
         aria-label="Top navigation"
         className={`pointer-events-none fixed left-1/2 top-5 z-[42] hidden h-[58px] w-fit max-w-[calc(100vw-2rem)] -translate-x-1/2 transition-all duration-300 lg:block ${
@@ -323,13 +323,13 @@ export function Navbar() {
         <div className="pointer-events-auto relative flex w-full items-center gap-0.5 rounded-[26px] bg-[#0d0d0d]/80 px-2.5 py-2 shadow-[0_24px_70px_rgba(0,0,0,0.38),inset_0_1px_0_rgba(255,255,255,0.07)] ring-1 ring-white/[0.06] backdrop-blur-[42px] backdrop-saturate-150">
           <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.14] to-transparent" />
 
-          {/* dulo.mov d. Logo */}
+          {/* arkaflix.app d. Logo */}
           <Link
             href="/"
-            aria-label="dulo home"
+            aria-label="arkaflix home"
             className="mr-1 flex shrink-0 items-center gap-2 rounded-[16px] pl-1.5 pr-2.5 text-white transition-opacity hover:opacity-80"
           >
-            <DuloLogoMark className="h-7 w-7 shrink-0 text-white" />
+            <ArkaflixLogoMark className="h-7 w-7 shrink-0 text-white" />
           </Link>
 
           {/* Fullscreen Toggle + Divider */}
@@ -419,7 +419,7 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* DESKTOP LEFT EDGE HANDLE & FLOATING ROUNDED SIDEBAR (dulo.mov exact) */}
+      {/* DESKTOP LEFT EDGE HANDLE & FLOATING ROUNDED SIDEBAR (arkaflix.app exact) */}
       <div
         onMouseEnter={() => {
           if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
@@ -457,18 +457,18 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* MOBILE TOP HEADER (dulo.mov exact) */}
+      {/* MOBILE TOP HEADER (arkaflix.app exact) */}
       <header
         aria-label="Mobile navigation"
         className="beta-mobile-header fixed inset-x-0 top-0 z-40 flex h-[64px] items-center justify-between px-4 lg:hidden"
       >
         <Link
           href="/"
-          aria-label="dulo home"
+          aria-label="arkaflix home"
           className="inline-flex min-h-11 items-center gap-2 text-white"
         >
-          <DuloLogoMark className="h-7 w-7 text-white" />
-          <span className="text-[20px] font-bold tracking-[-0.06em]">dulo</span>
+          <ArkaflixLogoMark className="h-7 w-7 text-white" />
+          <span className="text-[20px] font-bold tracking-[-0.06em]">arkaflix</span>
         </Link>
 
         <div className="flex items-center gap-1">
@@ -506,7 +506,7 @@ export function Navbar() {
         </div>
       )}
 
-      {/* MOBILE BOTTOM GLASS DOCK (dulo.mov exact) */}
+      {/* MOBILE BOTTOM GLASS DOCK (arkaflix.app exact) */}
       <nav
         aria-label="Mobile dock"
         className="beta-mobile-dock fixed inset-x-0 bottom-0 z-50 lg:hidden"
@@ -567,9 +567,9 @@ export function Footer() {
       <div className="grid gap-9 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
         <div>
           <div className="flex items-center gap-2">
-            <DuloLogoMark className="h-6 w-6 text-white" />
+            <ArkaflixLogoMark className="h-6 w-6 text-white" />
             <h2 className="text-lg font-semibold tracking-tight text-white">
-              dulo
+              arkaflix
             </h2>
           </div>
           <p className="mt-2 max-w-xs text-sm leading-6 text-white/70">
@@ -635,7 +635,7 @@ export function Footer() {
               Watch Parties
             </Link>
             <Link href="/my" className="transition hover:text-white">
-              Your Dulo
+              Your Arkaflix
             </Link>
             <Link href="/crm" className="transition hover:text-white">
               CRM
@@ -645,7 +645,7 @@ export function Footer() {
       </div>
 
       <div className="mt-10 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 border-t border-white/10 pt-5 text-xs text-white/55">
-        <span>© {new Date().getFullYear()} dulo · VidBolt HD Priority</span>
+        <span>© {new Date().getFullYear()} arkaflix · VidBolt HD Priority</span>
         <span>Posters &amp; Metadata by TMDB.</span>
       </div>
     </footer>

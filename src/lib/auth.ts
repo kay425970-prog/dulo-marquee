@@ -6,7 +6,7 @@ import { sessions, users } from "@/db/schema";
 import { dbConfigured } from "@/db";
 import { ensureDbInitialized } from "@/lib/db-bootstrap";
 
-export const SESSION_COOKIE = "dulo_session";
+export const SESSION_COOKIE = "arkaflix_session";
 const SESSION_DAYS = 30;
 
 export function hashPassword(password: string): string {

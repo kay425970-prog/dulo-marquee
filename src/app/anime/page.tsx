@@ -85,7 +85,7 @@ export default function AnimePage() {
 
   return (
     <main className="pb-20">
-      {/* DULO.MOV ANIME HERO STAGE */}
+      {/* ARKAFLIX.MOV ANIME HERO STAGE */}
       <div className="beta-hero-stage relative isolate">
         <div
           aria-hidden="true"
@@ -103,11 +103,11 @@ export default function AnimePage() {
           />
           <div className="beta-hero-shade absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
 
-          <div className="dulo-rail-px relative z-10 flex min-h-[max(500px,65svh)] flex-col justify-end pb-14 pt-24 sm:pb-18">
+          <div className="arkaflix-rail-px relative z-10 flex min-h-[max(500px,65svh)] flex-col justify-end pb-14 pt-24 sm:pb-18">
             <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
               <div className="max-w-xl">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-white/75">
-                  DULO · ANIME
+                  ARKAFLIX · ANIME
                 </p>
                 <Link href={`/title/anime/${heroAnime.id}`}>
                   <h1 className="mt-2 text-3xl font-black uppercase leading-[0.96] tracking-tight text-white text-shadow-hero sm:text-5xl">
@@ -174,7 +174,7 @@ export default function AnimePage() {
       </div>
 
       {/* FILTER CONTROLS & TMDB POSTER GRID */}
-      <section className="dulo-rail-px relative z-10 pt-4">
+      <section className="arkaflix-rail-px relative z-10 pt-4">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div className="flex flex-wrap items-center gap-2">
             {[

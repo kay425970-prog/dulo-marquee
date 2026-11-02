@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useMarquee } from "@/components/MarqueeProvider";
-import { DuloLogoMark } from "@/components/Navbar";
+import { ArkaflixLogoMark } from "@/components/Navbar";
 import {
   ShieldCheck,
   Lock,
@@ -53,8 +53,8 @@ const STAGES: Array<{
 export default function CrmPage() {
   const { notify } = useMarquee();
   const [unlocked, setUnlocked] = useState(false);
-  const [email, setEmail] = useState("elena.vance@dulo.mov");
-  const [password, setPassword] = useState("dulo-exec-2026");
+  const [email, setEmail] = useState("elena.vance@arkaflix.app");
+  const [password, setPassword] = useState("arkaflix-exec-2026");
 
   const [deals, setDeals] = useState<CrmDeal[]>([]);
   const [metrics, setMetrics] = useState<CrmMetrics | null>(null);
@@ -149,7 +149,7 @@ export default function CrmPage() {
         <div className="w-full rounded-[24px] border border-white/[0.16] bg-[#171717] p-7 shadow-[0_24px_64px_rgba(0,0,0,0.7)]">
           <div className="flex items-center gap-3">
             <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#da1b1b]/20 text-white ring-1 ring-[#da1b1b]/45">
-              <DuloLogoMark className="h-6 w-6" />
+              <ArkaflixLogoMark className="h-6 w-6" />
             </span>
             <div>
               <h1 className="text-lg font-bold text-white">CRM Admin Login</h1>
@@ -212,7 +212,7 @@ export default function CrmPage() {
   }
 
   return (
-    <main className="dulo-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
+    <main className="arkaflix-rail-px min-h-[100dvh] pb-24 pt-24 lg:pt-28">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">

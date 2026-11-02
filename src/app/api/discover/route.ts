@@ -575,7 +575,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ item: fullItem });
   }
 
-  // 2. HOMEPAGE LIVE TMDB RAILS (dulo.mov exact rails, filtered to released streamable titles with TMDB posters)
+  // 2. HOMEPAGE LIVE TMDB RAILS (arkaflix.app exact rails, filtered to released streamable titles with TMDB posters)
   if (mode === "home") {
     const today = new Date().toISOString().slice(0, 10);
     const [trendMovies, trendTv, popMovies, popTv, animeTv] = await Promise.all([

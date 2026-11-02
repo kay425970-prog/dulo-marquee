@@ -4,7 +4,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMarquee } from "@/components/MarqueeProvider";
-import { DuloLogoMark } from "@/components/Navbar";
+import { ArkaflixLogoMark } from "@/components/Navbar";
 import { Loader2, Mail, Lock, User } from "lucide-react";
 
 function LoginContent() {
@@ -64,10 +64,10 @@ function LoginContent() {
     <main className="flex min-h-[100dvh] items-center justify-center px-4 pb-24 pt-24">
       <div className="w-full max-w-md rounded-[24px] border border-white/[0.16] bg-[#171717] p-7 shadow-[0_24px_64px_rgba(0,0,0,0.75)] sm:p-9">
         <div className="flex items-center gap-3">
-          <DuloLogoMark className="h-9 w-9 text-white" />
+          <ArkaflixLogoMark className="h-9 w-9 text-white" />
           <div>
             <h1 className="text-xl font-bold tracking-tight text-white">
-              {mode === "signin" ? "Sign in to dulo" : "Create your dulo account"}
+              {mode === "signin" ? "Sign in to arkaflix" : "Create your arkaflix account"}
             </h1>
             <p className="text-xs text-white/50">
               Keep My List, ratings &amp; Continue Watching synced across devices.

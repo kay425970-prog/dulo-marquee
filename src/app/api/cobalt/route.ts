@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 /**
- * Cobalt — the HLS resolver dulo.mov uses.
+ * Cobalt — the HLS resolver arkaflix.app uses.
  *
- * dulo.mov's player ("Cobalt") does not embed a third-party iframe: it asks a
+ * arkaflix.app's player ("Cobalt") does not embed a third-party iframe: it asks a
  * Cloudflare Worker for a signed master playlist and plays HLS natively, which
  * is why its player can expose quality / audio / subtitle menus.
  *
@@ -81,8 +81,8 @@ export async function GET(req: NextRequest) {
       const res = await fetch(endpoint, {
         headers: {
           "User-Agent": UA,
-          Origin: "https://dulo.mov",
-          Referer: "https://dulo.mov/",
+          Origin: "https://arkaflix.app",
+          Referer: "https://arkaflix.vercel.app/",
           Accept: "application/json",
         },
         signal: AbortSignal.timeout(Math.min(8_000, deadline - Date.now() + 1_500)),

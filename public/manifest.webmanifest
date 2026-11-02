@@ -1,18 +1,25 @@
 {
   "id": "/?source=pwa",
-  "name": "dulo — Watch Free Movies & TV Shows",
-  "short_name": "dulo",
-  "description": "Stream movies, TV shows, anime and live TV in HD & 4K. VidCore-priority playback with TMDB catalog aggregation.",
+  "name": "Arkaflix \u2014 Watch Free Movies & TV Shows",
+  "short_name": "Arkaflix",
+  "description": "Stream movies, TV shows, anime and live TV in HD & 4K on Arkaflix.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "display_override": [
+    "fullscreen",
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "any",
   "background_color": "#0a0a0a",
   "theme_color": "#da1b1b",
   "lang": "en",
   "dir": "ltr",
-  "categories": ["entertainment", "video"],
+  "categories": [
+    "entertainment",
+    "video"
+  ],
   "prefer_related_applications": false,
   "icons": [
     {
@@ -41,10 +48,25 @@
     }
   ],
   "shortcuts": [
-    { "name": "Movies", "url": "/movies" },
-    { "name": "TV Shows", "url": "/shows" },
-    { "name": "Anime", "url": "/anime" },
-    { "name": "Live TV", "url": "/live" },
-    { "name": "My List", "url": "/my" }
+    {
+      "name": "Movies",
+      "url": "/movies"
+    },
+    {
+      "name": "TV Shows",
+      "url": "/shows"
+    },
+    {
+      "name": "Anime",
+      "url": "/anime"
+    },
+    {
+      "name": "Live TV",
+      "url": "/live"
+    },
+    {
+      "name": "My List",
+      "url": "/my"
+    }
   ]
 }

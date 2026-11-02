@@ -156,9 +156,9 @@ export default function PlatformSupport() {
 
     // One-time remote hint (dismissed automatically).
     try {
-      if (!window.localStorage.getItem("dulo_tv_hint_seen")) {
+      if (!window.localStorage.getItem("arkaflix_tv_hint_seen")) {
         setHintVisible(true);
-        window.localStorage.setItem("dulo_tv_hint_seen", "1");
+        window.localStorage.setItem("arkaflix_tv_hint_seen", "1");
         window.setTimeout(() => setHintVisible(false), 6500);
       }
     } catch {
