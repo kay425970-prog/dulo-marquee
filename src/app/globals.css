@@ -327,3 +327,57 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(218, 27, 27, 0.55);
 }
+
+/* ============================================================
+   TV / 10-foot UI + remote focus
+   Enabled by PlatformSupport via <html class="tv-mode">
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid #ff3b3b;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.tv-mode {
+  /* Larger base type so it reads from a couch */
+  font-size: 17px;
+}
+
+.tv-mode :focus,
+.tv-mode :focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 4px;
+  border-radius: 10px;
+  box-shadow: 0 0 0 7px rgba(218, 27, 27, 0.55), 0 12px 34px rgba(0, 0, 0, 0.55);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.tv-mode a:focus,
+.tv-mode button:focus {
+  transform: scale(1.04);
+  z-index: 5;
+}
+
+/* Keep the focused card fully visible inside horizontal rails */
+.tv-mode [data-tv-rail] {
+  scroll-padding-inline: 4rem;
+}
+
+/* Small screens and remote-hostile hover states */
+@media (hover: none) {
+  .group:hover .group-hover\:opacity-100 { opacity: 1; }
+}
+
+/* Prevent iOS double-tap zoom jumping while tapping fast */
+button, a { touch-action: manipulation; }
+
+/* Safe areas for notched phones & TV overscan */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+@media (min-width: 1920px) {
+  /* 1080p+ TVs: nudge type up without breaking layouts */
+  :root { --tv-scale: 1.06; }
+}

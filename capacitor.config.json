@@ -1,0 +1,23 @@
+{
+  "appId": "app.dulo.marquee",
+  "appName": "dulo",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "server": {
+    "url": "https://dulo-marquee.netlify.app",
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 600,
+      "backgroundColor": "#0a0a0a",
+      "showSpinner": false
+    }
+  }
+}

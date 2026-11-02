@@ -184,6 +184,7 @@ export default function HomePage() {
               <div className="mt-5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3">
                 <Link
                   href={`/title/${currentHero.type}/${currentHero.id}?play=1`}
+                  data-tv-autofocus
                   className="beta-action inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-white px-7 text-sm font-semibold text-black transition-all hover:bg-white/90 sm:text-base"
                 >
                   <Play className="h-4 w-4 fill-current" />
@@ -252,7 +253,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="scrollbar-hide dulo-rail-px flex gap-4 overflow-x-auto pb-4 pt-1">
+            <div data-tv-rail className="scrollbar-hide dulo-rail-px flex gap-4 overflow-x-auto pb-4 pt-1">
               {continueWatching.map((entry) => (
                 <div
                   key={entry.id}
@@ -327,7 +328,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="scrollbar-hide dulo-rail-px flex snap-x snap-proximity gap-3 overflow-x-auto pb-5 pt-1.5">
+          <div data-tv-rail className="scrollbar-hide dulo-rail-px flex snap-x snap-proximity gap-3 overflow-x-auto pb-5 pt-1.5">
             {PROVIDERS.filter((p) => p.type !== "store").map((prov) => (
               <Link
                 key={prov.id}

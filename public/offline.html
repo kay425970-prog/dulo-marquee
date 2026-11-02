@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <title>Offline · dulo</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(180deg, #070606, #0b0b0c 42%, #060607);
+        color: #fafafa;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        padding: 24px;
+        text-align: center;
+      }
+      .card {
+        max-width: 420px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: #171717;
+        border-radius: 22px;
+        padding: 32px 26px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+      }
+      .mark {
+        width: 56px; height: 56px; margin: 0 auto 18px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #ff3b3b, #da1b1b 55%, #8a0d0d);
+        display: grid; place-items: center;
+        font-size: 26px; font-weight: 800; color: #fff;
+      }
+      h1 { font-size: 20px; margin: 0 0 8px; letter-spacing: -0.02em; }
+      p { margin: 0 0 20px; font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.6); }
+      button, a.btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-height: 46px; padding: 0 22px;
+        border-radius: 999px; border: 0;
+        background: #fafafa; color: #111;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        text-decoration: none;
+      }
+      button:focus-visible, a.btn:focus-visible {
+        outline: 3px solid #da1b1b; outline-offset: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="mark">d</div>
+      <h1>You&rsquo;re offline</h1>
+      <p>
+        dulo needs a connection to load new titles. Your saved list and
+        continue-watching stay safe — reconnect and press retry.
+      </p>
+      <button type="button" onclick="location.reload()">Retry</button>
+    </div>
+  </body>
+</html>

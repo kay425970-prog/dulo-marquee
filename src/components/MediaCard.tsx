@@ -218,6 +218,7 @@ export function MediaRail({
 
       <div
         ref={scrollerRef}
+        data-tv-rail
         className={`scrollbar-hide dulo-rail-px flex snap-x snap-proximity overflow-x-auto pb-6 pt-1.5 ${
           landscape ? "gap-4 sm:gap-5" : "gap-3 sm:gap-4"
         }`}

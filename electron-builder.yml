@@ -1,0 +1,53 @@
+appId: app.dulo.marquee
+productName: dulo
+copyright: dulo
+
+directories:
+  output: dist
+  buildResources: electron/build
+
+# Only ship the desktop shell — the web app is loaded from the deployed URL.
+files:
+  - electron/**/*
+  - "!**/*.map"
+
+asar: true
+compression: maximum
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  icon: electron/build/icon.ico
+  artifactName: dulo-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: dulo
+  installerIcon: electron/build/icon.ico
+  uninstallerIcon: electron/build/icon.ico
+  deleteAppDataOnUninstall: false
+
+portable:
+  artifactName: dulo-${version}-portable.${ext}
+
+# Bonus targets so "all devices" is covered, not just Windows.
+linux:
+  target:
+    - AppImage
+  category: AudioVideo
+  icon: electron/build/icon.png
+  artifactName: dulo-${version}-${arch}.${ext}
+
+mac:
+  target:
+    - dmg
+  category: public.app-category.entertainment
+  icon: electron/build/icon.png
+  artifactName: dulo-${version}-${arch}.${ext}

@@ -1,0 +1,77 @@
+name: Build Windows EXE (+ Linux AppImage)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "electron/**"
+      - "electron-builder.yml"
+      - ".github/workflows/windows-exe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows installer & portable exe
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Install Electron toolchain (not part of the web build)
+        run: npm install --no-save electron@32 electron-builder@25
+
+      - name: Build Windows targets
+        run: npx electron-builder --win --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+          GH_TOKEN: ""
+
+      - name: List artifacts
+        run: Get-ChildItem dist | Format-Table Name,Length
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dulo-windows-exe
+          path: |
+            dist/*.exe
+          if-no-files-found: error
+          retention-days: 90
+
+  linux:
+    name: Linux AppImage (optional)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm install --no-save electron@32 electron-builder@25
+      - run: npx electron-builder --linux --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dulo-linux-appimage
+          path: dist/*.AppImage
+          if-no-files-found: warn
+          retention-days: 90
