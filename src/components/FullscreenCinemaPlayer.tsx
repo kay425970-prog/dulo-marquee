@@ -18,13 +18,11 @@ import {
   CheckCircle2,
   Server,
   Captions,
-  Volume2,
   Scan,
   X,
 } from "lucide-react";
 import {
   SUBTITLE_LANGUAGES,
-  AUDIO_LANGUAGES,
   loadPlayerPrefs,
   savePlayerPrefs,
   type PlayerPrefs,
@@ -97,8 +95,6 @@ export function FullscreenCinemaPlayer({
   >([]);
   const [subtitleLoading, setSubtitleLoading] = useState(false);
   const [subtitleNotice, setSubtitleNotice] = useState<string | null>(null);
-  const [detectedAudioLangs, setDetectedAudioLangs] = useState<string[]>([]);
-  const [audioNotice, setAudioNotice] = useState<string | null>(null);
   const [subOffset, setSubOffset] = useState(0);
 
   useEffect(() => {
@@ -121,10 +117,6 @@ export function FullscreenCinemaPlayer({
 
   const activeStream: ResolvedStreamOption | undefined =
     streams[streamIndex] || streams[0];
-  useEffect(() => {
-    setDetectedAudioLangs([]);
-    setAudioNotice(null);
-  }, [item.id, season, episode, activeStream?.id]);
 
   // ---- Universal subtitle engine: fetch tracks for this exact title/episode ----
   useEffect(() => {
@@ -184,33 +176,6 @@ export function FullscreenCinemaPlayer({
     episode,
   ]);
 
-  /**
-   * Embeds are cross-origin: we cannot enumerate or switch their audio tracks.
-   * Only the native player can. Tell the user the truth instead of silently
-   * doing nothing when they pick a language.
-   */
-  const audioSwitchingSupported =
-    Boolean(activeStream) && activeStream!.url.includes(".m3u8");
-  const audioLanguageAvailable =
-    detectedAudioLangs.length > 1 &&
-    (prefs.audioLang === "orig" || detectedAudioLangs.includes(prefs.audioLang));
-
-  useEffect(() => {
-    if (prefs.audioLang === "orig") {
-      setAudioNotice(null);
-      return;
-    }
-    if (!audioSwitchingSupported) {
-      setAudioNotice("This provider controls its own audio — use its in-player track menu");
-      return;
-    }
-    if (detectedAudioLangs.length > 1 && !detectedAudioLangs.includes(prefs.audioLang)) {
-      setAudioNotice(`Stream has no ${prefs.audioLang.toUpperCase()} audio track`);
-      return;
-    }
-    setAudioNotice(null);
-  }, [prefs.audioLang, audioSwitchingSupported, detectedAudioLangs]);
-
   const updatePrefs = useCallback((patch: Partial<PlayerPrefs>) => {
     setPrefs((prev) => {
       const next = { ...prev, ...patch };
@@ -219,7 +184,7 @@ export function FullscreenCinemaPlayer({
     });
   }, []);
 
-  // Append subtitle/audio language hints so embeds honour the preference too.
+  // Append the subtitle language hint so embeds honour the preference too.
   const embedUrl = useMemo(() => {
     if (!activeStream) return "";
     try {
@@ -228,15 +193,11 @@ export function FullscreenCinemaPlayer({
         url.searchParams.set("sub", prefs.subtitleLang);
         url.searchParams.set("sub_lang", prefs.subtitleLang);
       }
-      if (prefs.audioLang !== "orig") {
-        url.searchParams.set("lang", prefs.audioLang);
-        url.searchParams.set("audio", prefs.audioLang);
-      }
       return url.toString();
     } catch {
       return activeStream.url;
     }
-  }, [activeStream, prefs.subtitleLang, prefs.audioLang]);
+  }, [activeStream, prefs.subtitleLang]);
 
   // Show an escape hatch if the selected embed is blocked or hangs (especially
   // VidKing on restrictive networks). No sandbox is used on the iframe.
@@ -502,11 +463,6 @@ export function FullscreenCinemaPlayer({
                   {subtitleNotice}
                 </span>
               )}
-              {audioNotice && prefs.audioLang !== "orig" && (
-                <span className="rounded-md bg-amber-500/15 px-1.5 py-0.5 font-semibold text-amber-300 ring-1 ring-amber-400/25">
-                  {audioNotice}
-                </span>
-              )}
             </div>
           </div>
         </div>
@@ -559,38 +515,6 @@ export function FullscreenCinemaPlayer({
               </button>
             </div>
           )}
-
-          {/* Universal audio engine — remote-friendly picker */}
-          <TvPicker
-            icon={<Volume2 className="h-3.5 w-3.5" />}
-            label="Audio"
-            value={prefs.audioLang}
-            active={prefs.audioLang !== "orig" && audioLanguageAvailable}
-            warn={prefs.audioLang !== "orig" && Boolean(audioNotice)}
-            badge={
-              detectedAudioLangs.length > 1 ? detectedAudioLangs.length : undefined
-            }
-            title={
-              audioSwitchingSupported
-                ? detectedAudioLangs.length > 1
-                  ? `Stream audio tracks: ${detectedAudioLangs.join(", ").toUpperCase()}`
-                  : "This stream exposes a single audio track"
-                : "This provider controls its own audio tracks"
-            }
-            onInteract={revealHud}
-            options={AUDIO_LANGUAGES.map((l) => {
-              const unavailable =
-                l.code !== "orig" &&
-                detectedAudioLangs.length > 1 &&
-                !detectedAudioLangs.includes(l.code);
-              return {
-                value: l.code,
-                label: l.label,
-                hint: unavailable ? "not in this stream" : undefined,
-              };
-            })}
-            onChange={(v) => updatePrefs({ audioLang: v })}
-          />
 
           {/* Fill / fit toggle */}
           <button

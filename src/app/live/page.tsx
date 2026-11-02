@@ -44,8 +44,6 @@ function LiveTvContent() {
   const [m3uInput, setM3uInput] = useState("");
   const [customName, setCustomName] = useState("");
   const [importing, setImporting] = useState(false);
-  const [audioLang, setAudioLang] = useState("orig");
-  const [detectedAudio, setDetectedAudio] = useState<string[]>([]);
 
   const loadCustomChannels = useCallback(async () => {
     try {
@@ -171,43 +169,8 @@ function LiveTvContent() {
             subtitle={`${activeChannel.category} · ${activeChannel.currentShow}`}
             isLive
             autoPlay
-            audioLang={audioLang}
             activeSubtitleLang="off"
-            onAudioTracksDetected={setDetectedAudio}
           />
-
-          {/* Audio + subtitle engines (native player — real track switching) */}
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <label className="flex h-10 items-center gap-1.5 rounded-full bg-white/[0.07] px-3 text-xs font-semibold text-white ring-1 ring-white/[0.08]">
-              <span className="text-white/60">Audio</span>
-              <select
-                value={audioLang}
-                onChange={(e) => setAudioLang(e.target.value)}
-                className="cursor-pointer bg-transparent text-xs font-semibold text-white outline-none"
-              >
-                <option value="orig" className="bg-[#171717]">Default</option>
-                {["en", "es", "fr", "de", "pt", "it", "hi", "ja", "ko", "ar", "ru"].map((c) => (
-                  <option key={c} value={c} className="bg-[#171717]">
-                    {c.toUpperCase()}
-                    {detectedAudio.length > 1 && !detectedAudio.includes(c)
-                      ? " · not in stream"
-                      : ""}
-                  </option>
-                ))}
-              </select>
-              {detectedAudio.length > 1 && (
-                <span className="rounded bg-emerald-500/20 px-1 text-[10px] font-bold text-emerald-300">
-                  {detectedAudio.length} tracks
-                </span>
-              )}
-            </label>
-
-            {detectedAudio.length > 1 && (
-              <span className="text-[11px] font-medium text-emerald-300">
-                Stream offers: {detectedAudio.join(", ").toUpperCase()}
-              </span>
-            )}
-          </div>
 
           <div className="beta-panel mt-4 flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
             <div className="flex items-center gap-3.5">

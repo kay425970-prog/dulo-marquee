@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import {
   Play,
@@ -35,14 +35,10 @@ interface HlsVideoPlayerProps {
   subtitleTracks?: SubtitleTrack[];
   /** Language code of the currently selected subtitle track, or "off". */
   activeSubtitleLang?: string;
-  /** Preferred audio language ("orig" keeps the source default). */
-  audioLang?: string;
   /** cover = fill the screen (crop), contain = letterbox the whole frame. */
   fitMode?: "cover" | "contain";
   subtitleSize?: "sm" | "md" | "lg";
   subtitleBg?: boolean;
-  /** Reported so the UI can show which audio languages the stream offers. */
-  onAudioTracksDetected?: (languages: string[]) => void;
 }
 
 export function HlsVideoPlayer({
@@ -56,11 +52,9 @@ export function HlsVideoPlayer({
   onProgress,
   subtitleTracks = [],
   activeSubtitleLang = "off",
-  audioLang = "orig",
   fitMode = "cover",
   subtitleSize = "md",
   subtitleBg = true,
-  onAudioTracksDetected,
 }: HlsVideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -95,107 +89,6 @@ export function HlsVideoPlayer({
     return () => video.removeEventListener("loadedmetadata", apply);
   }, [activeSubtitleLang, subtitleTracks, src]);
 
-  // ---- Universal audio engine ----
-  // Two real mechanisms, because `video.audioTracks` is Safari-only and silently
-  // does nothing in Chrome / Edge / Firefox / Android TV:
-  //   1. hls.js multi-audio renditions  (hls.audioTracks / hls.audioTrack)
-  //   2. native <video>.audioTracks     (Safari, and MP4 with multiple tracks)
-  // Whatever is discovered is reported upward so the UI can show what the
-  // stream actually offers instead of pretending a switch happened.
-  const hlsRef = useRef<Hls | null>(null);
-  const [nativeAudioLanguages, setNativeAudioLanguages] = useState<string[]>([]);
-
-  const applyAudioLanguage = useCallback(
-    (lang: string) => {
-      if (lang === "orig") return;
-
-      // --- hls.js path ---
-      const hls = hlsRef.current;
-      if (hls && hls.audioTracks && hls.audioTracks.length > 1) {
-        const idx = hls.audioTracks.findIndex((t) => {
-          const code = (t.lang || t.name || "").slice(0, 2).toLowerCase();
-          return code === lang;
-        });
-        if (idx >= 0 && hls.audioTrack !== idx) {
-          hls.audioTrack = idx;
-          return;
-        }
-      }
-
-      // --- native path (Safari / multi-track MP4) ---
-      const video = videoRef.current as
-        | (HTMLVideoElement & {
-            audioTracks?: {
-              length: number;
-              [i: number]: {
-                language?: string;
-                label?: string;
-                enabled: boolean;
-              };
-            };
-          })
-        | null;
-      const list = video?.audioTracks;
-      if (!list || !list.length) return;
-      for (let i = 0; i < list.length; i += 1) {
-        const t = list[i];
-        const code = (t?.language || t?.label || "").slice(0, 2).toLowerCase();
-        if (t) t.enabled = code === lang;
-      }
-    },
-    []
-  );
-
-  // Re-apply whenever the preference changes or a new stream loads.
-  useEffect(() => {
-    applyAudioLanguage(audioLang);
-  }, [audioLang, src, applyAudioLanguage, onAudioTracksDetected]);
-
-  // Report which audio languages this stream actually exposes.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const read = () => {
-      const found = new Set<string>();
-
-      const hls = hlsRef.current;
-      if (hls?.audioTracks) {
-        for (const t of hls.audioTracks) {
-          const code = (t.lang || t.name || "").slice(0, 2).toLowerCase();
-          if (code) found.add(code);
-        }
-      }
-
-      const native = (
-        video as HTMLVideoElement & {
-          audioTracks?: { length: number; [i: number]: { language?: string; label?: string } };
-        }
-      ).audioTracks;
-      if (native) {
-        for (let i = 0; i < native.length; i += 1) {
-          const code = (native[i]?.language || native[i]?.label || "")
-            .slice(0, 2)
-            .toLowerCase();
-          if (code) found.add(code);
-        }
-      }
-
-      const langs = Array.from(found);
-      setNativeAudioLanguages(langs);
-      onAudioTracksDetected?.(langs);
-      applyAudioLanguage(audioLang);
-    };
-
-    read();
-    video.addEventListener("loadedmetadata", read);
-    video.addEventListener("canplay", read);
-    return () => {
-      video.removeEventListener("loadedmetadata", read);
-      video.removeEventListener("canplay", read);
-    };
-  }, [audioLang, src, applyAudioLanguage]);
-
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !src) return;
@@ -211,25 +104,8 @@ export function HlsVideoPlayer({
         enableWorker: true,
         lowLatencyMode: isLive,
       });
-      hlsRef.current = hls;
       hls.loadSource(src);
       hls.attachMedia(video);
-
-      const syncAudioTracks = () => {
-        if (!hls?.audioTracks?.length) return;
-        const langs = Array.from(
-          new Set(
-            hls.audioTracks
-              .map((t) => (t.lang || t.name || "").slice(0, 2).toLowerCase())
-              .filter(Boolean)
-          )
-        );
-        setNativeAudioLanguages(langs);
-        onAudioTracksDetected?.(langs);
-        applyAudioLanguage(audioLang);
-      };
-      hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, syncAudioTracks);
-      hls.on(Hls.Events.MANIFEST_PARSED, syncAudioTracks);
 
       hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
         setBuffering(false);
@@ -291,7 +167,6 @@ export function HlsVideoPlayer({
     return () => {
       if (hls) {
         hls.destroy();
-        hlsRef.current = null;
       }
     };
   }, [src, isLive, autoPlay, initialSeconds]);
@@ -435,14 +310,6 @@ export function HlsVideoPlayer({
           <span className="rounded-md border border-white/15 bg-black/60 px-2 py-0.5 text-[11px] font-bold text-violet-200 backdrop-blur">
             {resolutionLabel}
           </span>
-          {nativeAudioLanguages.length > 1 && (
-            <span
-              title="Audio tracks detected in this stream"
-              className="rounded-md border border-white/15 bg-black/60 px-2 py-0.5 text-[11px] font-bold text-emerald-300 backdrop-blur"
-            >
-              {nativeAudioLanguages.length} audio
-            </span>
-          )}
         </div>
       </div>
 

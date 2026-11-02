@@ -3,14 +3,12 @@
 /**
  * Persistent player preferences shared by every playback surface:
  *  - subtitle language ("off" disables the universal subtitle engine)
- *  - original audio language (translated/dub request for embeds + native tracks)
  *  - video fit ("cover" = fill the screen, "contain" = letterbox)
  *  - subtitle styling (size / background) for readability on TVs
  */
 
 export interface PlayerPrefs {
   subtitleLang: string;
-  audioLang: string;
   fitMode: "cover" | "contain";
   subtitleSize: "sm" | "md" | "lg";
   subtitleBg: boolean;
@@ -38,26 +36,8 @@ export const SUBTITLE_LANGUAGES = [
   { code: "id", label: "Indonesian" },
 ] as const;
 
-export const AUDIO_LANGUAGES = [
-  { code: "orig", label: "Original audio" },
-  { code: "en", label: "English" },
-  { code: "es", label: "Spanish" },
-  { code: "fr", label: "French" },
-  { code: "de", label: "German" },
-  { code: "pt", label: "Portuguese" },
-  { code: "it", label: "Italian" },
-  { code: "hi", label: "Hindi" },
-  { code: "ja", label: "Japanese" },
-  { code: "ko", label: "Korean" },
-  { code: "zh", label: "Chinese" },
-  { code: "ru", label: "Russian" },
-  { code: "ar", label: "Arabic" },
-  { code: "tr", label: "Turkish" },
-] as const;
-
 export const DEFAULT_PREFS: PlayerPrefs = {
   subtitleLang: "en",
-  audioLang: "orig",
   fitMode: "cover",
   subtitleSize: "md",
   subtitleBg: true,
@@ -88,7 +68,8 @@ export function savePlayerPrefs(prefs: PlayerPrefs): void {
   }
 }
 
-export function langLabel(code: string, kind: "subtitle" | "audio"): string {
-  const list = kind === "subtitle" ? SUBTITLE_LANGUAGES : AUDIO_LANGUAGES;
-  return list.find((l) => l.code === code)?.label ?? code.toUpperCase();
+export function langLabel(code: string): string {
+  return (
+    SUBTITLE_LANGUAGES.find((l) => l.code === code)?.label ?? code.toUpperCase()
+  );
 }
