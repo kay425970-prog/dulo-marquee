@@ -14,6 +14,7 @@ import {
   Send,
   Loader2,
   CheckCircle2,
+  Server,
   X,
 } from "lucide-react";
 
@@ -68,6 +69,7 @@ export function FullscreenCinemaPlayer({
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [streamIndex, setStreamIndex] = useState(0);
+  const [manualStream, setManualStream] = useState(false);
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [hudVisible, setHudVisible] = useState(true);
   const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
@@ -79,6 +81,7 @@ export function FullscreenCinemaPlayer({
 
   useEffect(() => {
     setStreamIndex(0);
+    setManualStream(false);
     setIframeLoaded(false);
   }, [streams, season, episode, item.id]);
 
@@ -163,8 +166,9 @@ export function FullscreenCinemaPlayer({
   }, [open, revealHud]);
 
   // Silent Auto-Failover Watchdog: automatically advance if an embed takes > 10s to load
+  // (disabled after a manual API override so the user's choice sticks).
   useEffect(() => {
-    if (!open || !activeStream || iframeLoaded) {
+    if (!open || !activeStream || iframeLoaded || manualStream) {
       return;
     }
     if (streamIndex >= streams.length - 1) return;
@@ -176,7 +180,7 @@ export function FullscreenCinemaPlayer({
     }, 10500);
 
     return () => clearTimeout(timer);
-  }, [open, activeStream, iframeLoaded, streamIndex, streams.length]);
+  }, [open, activeStream, iframeLoaded, streamIndex, streams.length, manualStream]);
 
   // Listen for progress telemetry emitted via postMessage
   useEffect(() => {
@@ -317,15 +321,62 @@ export function FullscreenCinemaPlayer({
               <span className="inline-flex items-center gap-1 font-semibold text-emerald-400">
                 <CheckCircle2 className="h-3 w-3" />
                 {activeStream
-                  ? `Auto-Connected · ${activeStream.qualityTag}`
+                  ? `${manualStream ? "Manual API" : "Auto-Connected"} · ${activeStream.qualityTag}`
                   : "Connecting VidCore 4K..."}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Right: Episode Switcher + Watch Party + Native Fullscreen */}
+        {/* Right: API Selector + Episode Switcher + Watch Party + Native Fullscreen */}
         <div className="flex items-center gap-2">
+          {/* Streaming API Dropdown (Auto by default, manual override available) */}
+          <div className="flex h-10 items-center gap-1.5 rounded-full bg-[#0d0d0d]/80 px-3 ring-1 ring-white/[0.1] backdrop-blur-2xl">
+            <Server className="h-3.5 w-3.5 shrink-0 text-white/70" />
+            <select
+              aria-label="Select streaming API"
+              value={manualStream ? String(streamIndex) : "auto"}
+              onMouseDown={revealHud}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "auto") {
+                  setManualStream(false);
+                  setStreamIndex(0);
+                } else {
+                  const nextIndex = Number(value);
+                  if (Number.isInteger(nextIndex) && streams[nextIndex]) {
+                    setManualStream(true);
+                    setStreamIndex(nextIndex);
+                  }
+                }
+                setIframeLoaded(false);
+                revealHud();
+              }}
+              className="max-w-[148px] cursor-pointer bg-transparent text-xs font-semibold text-white outline-none sm:max-w-[210px]"
+            >
+              <option value="auto" className="bg-[#171717] text-white">
+                Auto · Best ({streams[0]?.provider || "VidCore"})
+              </option>
+              {streams.map((stream, idx) => {
+                let host = stream.provider;
+                try {
+                  host = new URL(stream.url).hostname.replace(/^www\./, "");
+                } catch {
+                  // keep provider label
+                }
+                return (
+                  <option
+                    key={`${stream.id}-${idx}`}
+                    value={String(idx)}
+                    className="bg-[#171717] text-white"
+                  >
+                    {stream.provider} · {host}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
           {hasEpisodes && (
             <>
               <button
@@ -434,7 +485,7 @@ export function FullscreenCinemaPlayer({
             referrerPolicy="origin"
             onLoad={() => setIframeLoaded(true)}
             onError={() => {
-              if (streamIndex < streams.length - 1) {
+              if (!manualStream && streamIndex < streams.length - 1) {
                 setStreamIndex((idx) => idx + 1);
               }
             }}
