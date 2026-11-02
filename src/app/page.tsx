@@ -317,7 +317,7 @@ export default function HomePage() {
                 Channels &amp; Apps
               </h2>
               <p className="mt-1 text-[11px] font-medium leading-none text-white/[0.55]">
-                US catalog · Stream directly via VidCore
+                US catalog · Stream directly via VidLink
               </p>
             </div>
             <Link

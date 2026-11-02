@@ -307,7 +307,7 @@ export function FullscreenCinemaPlayer({
             : "pointer-events-none opacity-0"
         }`}
       >
-        {/* Left: Back Pill + Title + Prioritized VidCore Status */}
+        {/* Left: Back Pill + Title + prioritized engine status */}
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
@@ -335,7 +335,7 @@ export function FullscreenCinemaPlayer({
                 <CheckCircle2 className="h-3 w-3" />
                 {activeStream
                   ? `${manualStream ? "Manual API" : "Auto-Connected"} · ${activeStream.qualityTag}`
-                  : "Connecting VidCore 4K..."}
+                  : "Connecting VidLink 4K..."}
               </span>
             </div>
           </div>
@@ -369,7 +369,7 @@ export function FullscreenCinemaPlayer({
               className="max-w-[148px] cursor-pointer bg-transparent text-xs font-semibold text-white outline-none sm:max-w-[210px]"
             >
               <option value="auto" className="bg-[#171717] text-white">
-                Auto · Best ({streams[0]?.provider || "VidCore"})
+                Auto · Best ({streams[0]?.provider || "VidLink"})
               </option>
               {streams.map((stream, idx) => {
                 let host = stream.provider;
@@ -486,7 +486,7 @@ export function FullscreenCinemaPlayer({
               <>
                 <Loader2 className="h-10 w-10 animate-spin text-[#da1b1b]" />
                 <p className="text-xs font-semibold text-white/85">
-                  Launching {item.title} on {activeStream?.provider || "VidCore"}...
+                  Launching {item.title} on {activeStream?.provider || "VidLink"}...
                 </p>
               </>
             ) : (

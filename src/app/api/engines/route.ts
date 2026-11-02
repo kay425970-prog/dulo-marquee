@@ -9,8 +9,14 @@ export const dynamic = "force-dynamic";
  * vidsrc is hard-blocked and never registered.
  */
 export async function GET() {
+  // Derived from the registry so the reported priority can never drift from
+  // the actual tier-1 engine.
+  const topTier = Math.min(...STREAM_ENGINES.map((e) => e.tier));
+  const prioritizedProvider =
+    STREAM_ENGINES.find((e) => e.tier === topTier)?.provider ?? "VidLink";
+
   return NextResponse.json({
-    prioritizedProvider: "VidCore",
+    prioritizedProvider,
     blockedFamilies: ["vidsrc"],
     engineCount: STREAM_ENGINES.length,
     engines: STREAM_ENGINES.map((e) => ({

@@ -575,7 +575,7 @@ export function Footer() {
             Movies, shows, anime and live TV in one place.
           </p>
           <p className="mt-4 max-w-xs text-xs leading-5 text-white/60">
-            Prioritized VidCore 4K streaming &amp; multi-service catalog
+            Prioritized VidLink 4K streaming &amp; multi-service catalog
             aggregation. No player download or payment details needed.
           </p>
         </div>
@@ -644,7 +644,7 @@ export function Footer() {
       </div>
 
       <div className="mt-10 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 border-t border-white/10 pt-5 text-xs text-white/55">
-        <span>© {new Date().getFullYear()} dulo · VidCore 4K Priority</span>
+        <span>© {new Date().getFullYear()} dulo · VidLink 4K Priority</span>
         <span>Posters &amp; Metadata by TMDB.</span>
       </div>
     </footer>

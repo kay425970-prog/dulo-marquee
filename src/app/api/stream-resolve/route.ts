@@ -68,7 +68,7 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "VidCore",
     label: "VidCore 4K Edge",
     host: "vidcore.org",
-    tier: 1,
+    tier: 3,
     timeoutMs: 5200,
     qualityTag: "VidCore · 4K Ad-Free Edge CDN",
     movie: (id) =>
@@ -95,9 +95,9 @@ export const STREAM_ENGINES: EngineDef[] = [
     provider: "VidLink",
     label: "VidLink 4K",
     host: "vidlink.pro",
-    tier: 3,
+    tier: 1,
     timeoutMs: 4400,
-    qualityTag: "VidLink · 4K Multi-Audio",
+    qualityTag: "VidLink · 4K Primary · Multi-Audio",
     movie: (id) =>
       `https://vidlink.pro/movie/${id}?autoplay=true&primaryColor=da1b1b&secondaryColor=171717&iconColor=fafafa`,
     tv: (id, s, e) =>
@@ -443,16 +443,16 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     primary:
       primary ?? {
-        id: "vidcore-primary",
-        provider: "VidCore",
-        label: "VidCore 4K Edge",
-        url: `https://vidcore.org/embed/movie/${tmdbId}?autoplay=true&theme=da1b1b`,
+        id: "vidlink",
+        provider: "VidLink",
+        label: "VidLink 4K",
+        url: `https://vidlink.pro/movie/${tmdbId}?autoplay=true&primaryColor=da1b1b&secondaryColor=171717&iconColor=fafafa`,
         latencyMs: 320,
-        qualityTag: "VidCore · 4K Ad-Free Edge CDN",
+        qualityTag: "VidLink · 4K Primary · Multi-Audio",
       },
     backups: ordered.slice(1),
     engines,
-    prioritizedProvider: primary?.provider ?? "VidCore",
+    prioritizedProvider: primary?.provider ?? "VidLink",
     engineCount: ordered.length,
     blockedFamilies: ["vidsrc"],
     autoResolved: true,
