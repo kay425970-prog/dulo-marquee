@@ -15,8 +15,18 @@ import {
   Loader2,
   CheckCircle2,
   Server,
+  Captions,
+  Volume2,
+  Scan,
   X,
 } from "lucide-react";
+import {
+  SUBTITLE_LANGUAGES,
+  AUDIO_LANGUAGES,
+  loadPlayerPrefs,
+  savePlayerPrefs,
+  type PlayerPrefs,
+} from "@/lib/player-prefs";
 
 export interface ActiveWatchPartyRoom {
   id: number;
@@ -79,6 +89,12 @@ export function FullscreenCinemaPlayer({
   const [drawerSeason, setDrawerSeason] = useState(season);
   const [chatInput, setChatInput] = useState("");
   const [floatingReaction, setFloatingReaction] = useState<string | null>(null);
+  const [prefs, setPrefs] = useState<PlayerPrefs>(() => loadPlayerPrefs());
+  const [subtitleTracks, setSubtitleTracks] = useState<
+    Array<{ lang: string; label: string; url: string }>
+  >([]);
+  const [subtitleLoading, setSubtitleLoading] = useState(false);
+  const [subtitleNotice, setSubtitleNotice] = useState<string | null>(null);
 
   useEffect(() => {
     setStreamIndex(0);
@@ -99,6 +115,91 @@ export function FullscreenCinemaPlayer({
 
   const activeStream: ResolvedStreamOption | undefined =
     streams[streamIndex] || streams[0];
+
+  // ---- Universal subtitle engine: fetch tracks for this exact title/episode ----
+  useEffect(() => {
+    if (!open || prefs.subtitleLang === "off") {
+      setSubtitleTracks([]);
+      return;
+    }
+    const isEpisodic =
+      item.tmdbMediaType === "tv" ||
+      Boolean(item.seasons && item.seasons.length > 0);
+
+    const qs = new URLSearchParams({
+      type: isEpisodic ? "tv" : "movie",
+      tmdbId: item.tmdbId,
+      langs: prefs.subtitleLang,
+    });
+    if (isEpisodic) {
+      qs.set("season", String(season));
+      qs.set("episode", String(episode));
+    }
+
+    let cancelled = false;
+    setSubtitleLoading(true);
+    fetch(`/api/subtitles?${qs.toString()}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled) return;
+        const tracks = (data?.subtitles ?? []) as Array<{
+          lang: string;
+          label: string;
+          url: string;
+        }>;
+        setSubtitleTracks(tracks);
+        setSubtitleNotice(
+          tracks.length === 0 && prefs.subtitleLang !== "off"
+            ? "No subtitles found for this title"
+            : null
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setSubtitleTracks([]);
+      })
+      .finally(() => {
+        if (!cancelled) setSubtitleLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    open,
+    prefs.subtitleLang,
+    item.tmdbId,
+    item.tmdbMediaType,
+    item.seasons,
+    season,
+    episode,
+  ]);
+
+  const updatePrefs = useCallback((patch: Partial<PlayerPrefs>) => {
+    setPrefs((prev) => {
+      const next = { ...prev, ...patch };
+      savePlayerPrefs(next);
+      return next;
+    });
+  }, []);
+
+  // Append subtitle/audio language hints so embeds honour the preference too.
+  const embedUrl = useMemo(() => {
+    if (!activeStream) return "";
+    try {
+      const url = new URL(activeStream.url);
+      if (prefs.subtitleLang !== "off") {
+        url.searchParams.set("sub", prefs.subtitleLang);
+        url.searchParams.set("sub_lang", prefs.subtitleLang);
+      }
+      if (prefs.audioLang !== "orig") {
+        url.searchParams.set("lang", prefs.audioLang);
+        url.searchParams.set("audio", prefs.audioLang);
+      }
+      return url.toString();
+    } catch {
+      return activeStream.url;
+    }
+  }, [activeStream, prefs.subtitleLang, prefs.audioLang]);
 
   // Show an escape hatch if the selected embed is blocked or hangs (especially
   // VidKing on restrictive networks). No sandbox is used on the iframe.
@@ -337,12 +438,92 @@ export function FullscreenCinemaPlayer({
                   ? `${manualStream ? "Manual API" : "Auto-Connected"} · ${activeStream.qualityTag}`
                   : "Connecting VidLink 4K..."}
               </span>
+              {subtitleTracks.length > 0 && prefs.subtitleLang !== "off" && (
+                <span className="rounded-md bg-emerald-500/15 px-1.5 py-0.5 font-semibold text-emerald-300 ring-1 ring-emerald-400/25">
+                  CC {prefs.subtitleLang.toUpperCase()}
+                </span>
+              )}
+              {subtitleNotice && (
+                <span className="rounded-md bg-amber-500/15 px-1.5 py-0.5 font-semibold text-amber-300 ring-1 ring-amber-400/25">
+                  {subtitleNotice}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         {/* Right: API Selector + Episode Switcher + Watch Party + Native Fullscreen */}
         <div className="flex items-center gap-2">
+          {/* Universal subtitle engine */}
+          <div className="flex h-10 items-center gap-1.5 rounded-full bg-[#0d0d0d]/80 px-3 ring-1 ring-white/[0.1] backdrop-blur-2xl">
+            <Captions className="h-3.5 w-3.5 shrink-0 text-white/70" />
+            <select
+              aria-label="Subtitles"
+              value={prefs.subtitleLang}
+              onMouseDown={revealHud}
+              onChange={(e) => updatePrefs({ subtitleLang: e.target.value })}
+              className="max-w-[112px] cursor-pointer bg-transparent text-xs font-semibold text-white outline-none sm:max-w-[136px]"
+            >
+              {SUBTITLE_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code} className="bg-[#171717] text-white">
+                  {l.code === "off" ? "CC Off" : l.label}
+                </option>
+              ))}
+            </select>
+            {subtitleLoading && (
+              <Loader2 className="h-3 w-3 animate-spin text-white/50" />
+            )}
+            {!subtitleLoading && subtitleTracks.length > 0 && (
+              <span className="rounded bg-emerald-500/20 px-1 text-[10px] font-bold text-emerald-300">
+                {subtitleTracks.length}
+              </span>
+            )}
+          </div>
+
+          {/* Universal audio engine */}
+          <div className="flex h-10 items-center gap-1.5 rounded-full bg-[#0d0d0d]/80 px-3 ring-1 ring-white/[0.1] backdrop-blur-2xl">
+            <Volume2 className="h-3.5 w-3.5 shrink-0 text-white/70" />
+            <select
+              aria-label="Audio language"
+              value={prefs.audioLang}
+              onMouseDown={revealHud}
+              onChange={(e) => updatePrefs({ audioLang: e.target.value })}
+              className="max-w-[112px] cursor-pointer bg-transparent text-xs font-semibold text-white outline-none sm:max-w-[140px]"
+            >
+              {AUDIO_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code} className="bg-[#171717] text-white">
+                  {l.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Fill / fit toggle */}
+          <button
+            type="button"
+            onClick={() =>
+              updatePrefs({
+                fitMode: prefs.fitMode === "cover" ? "contain" : "cover",
+              })
+            }
+            title={
+              prefs.fitMode === "cover"
+                ? "Filling screen — switch to fit"
+                : "Fitting screen — switch to fill"
+            }
+            aria-label="Toggle video fit"
+            className={`inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 backdrop-blur-2xl transition ${
+              prefs.fitMode === "cover"
+                ? "bg-[#da1b1b] text-white ring-[#da1b1b]"
+                : "bg-[#0d0d0d]/80 text-white ring-white/[0.1] hover:bg-white/[0.14]"
+            }`}
+          >
+            <Scan className="h-3.5 w-3.5" />
+            <span className="hidden lg:inline">
+              {prefs.fitMode === "cover" ? "Fill" : "Fit"}
+            </span>
+          </button>
+
           {/* Streaming API Dropdown (Auto by default, manual override available) */}
           <div className="flex h-10 items-center gap-1.5 rounded-full bg-[#0d0d0d]/80 px-3 ring-1 ring-white/[0.1] backdrop-blur-2xl">
             <Server className="h-3.5 w-3.5 shrink-0 text-white/70" />
@@ -479,7 +660,7 @@ export function FullscreenCinemaPlayer({
       </div>
 
       {/* FULLSCREEN STREAMING IFRAME STAGE */}
-      <div className="relative flex h-full w-full flex-1 items-center justify-center bg-black">
+      <div className="relative flex h-full w-full flex-1 items-center justify-center overflow-hidden bg-black">
         {(resolvingStreams && !activeStream) || !iframeLoaded ? (
           <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]/90 px-6 text-center">
             {!loadTimedOut ? (
@@ -532,7 +713,7 @@ export function FullscreenCinemaPlayer({
         {activeStream && (
           <iframe
             key={`${activeStream.id}-${activeStream.url}`}
-            src={activeStream.url}
+            src={embedUrl || activeStream.url}
             title={item.title}
             // Intentionally NO sandbox attribute: VidKing and other embed
             // players need unrestricted script, media, and fullscreen access.
@@ -548,7 +729,7 @@ export function FullscreenCinemaPlayer({
                 setStreamIndex((idx) => idx + 1);
               }
             }}
-            className="h-full w-full border-0"
+            className="absolute inset-0 h-full w-full border-0"
           />
         )}
 

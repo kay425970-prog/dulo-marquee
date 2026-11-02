@@ -16,6 +16,12 @@ import {
   Radio,
 } from "lucide-react";
 
+export interface SubtitleTrack {
+  lang: string;
+  label: string;
+  url: string;
+}
+
 interface HlsVideoPlayerProps {
   src: string;
   poster?: string;
@@ -25,6 +31,16 @@ interface HlsVideoPlayerProps {
   autoPlay?: boolean;
   initialSeconds?: number;
   onProgress?: (percent: number, currentSeconds: number) => void;
+  /** Universal subtitle engine tracks (rendered as native <track> elements). */
+  subtitleTracks?: SubtitleTrack[];
+  /** Language code of the currently selected subtitle track, or "off". */
+  activeSubtitleLang?: string;
+  /** Preferred audio language ("orig" keeps the source default). */
+  audioLang?: string;
+  /** cover = fill the screen (crop), contain = letterbox the whole frame. */
+  fitMode?: "cover" | "contain";
+  subtitleSize?: "sm" | "md" | "lg";
+  subtitleBg?: boolean;
 }
 
 export function HlsVideoPlayer({
@@ -36,6 +52,12 @@ export function HlsVideoPlayer({
   autoPlay = false,
   initialSeconds = 0,
   onProgress,
+  subtitleTracks = [],
+  activeSubtitleLang = "off",
+  audioLang = "orig",
+  fitMode = "cover",
+  subtitleSize = "md",
+  subtitleBg = true,
 }: HlsVideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -48,6 +70,62 @@ export function HlsVideoPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [resolutionLabel, setResolutionLabel] = useState("HD Adaptive");
+
+  // ---- Universal subtitle engine: activate the selected <track> ----
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const apply = () => {
+      const tracks = video.textTracks;
+      for (let i = 0; i < tracks.length; i += 1) {
+        const track = tracks[i];
+        const lang = (track.language || "").toLowerCase();
+        const shouldShow =
+          activeSubtitleLang !== "off" && lang === activeSubtitleLang.toLowerCase();
+        track.mode = shouldShow ? "showing" : "disabled";
+      }
+    };
+
+    apply();
+    video.addEventListener("loadedmetadata", apply);
+    return () => video.removeEventListener("loadedmetadata", apply);
+  }, [activeSubtitleLang, subtitleTracks, src]);
+
+  // ---- Universal audio engine: pick the preferred audio track when offered ----
+  const audioTracksRef = useRef<Array<{ language?: string; label?: string; enabled?: boolean }>>([]);
+  const [nativeAudioLanguages, setNativeAudioLanguages] = useState<string[]>([]);
+
+  useEffect(() => {
+    const video = videoRef.current as
+      | (HTMLVideoElement & { audioTracks?: { length: number; [i: number]: { language?: string; label?: string; enabled: boolean } } })
+      | null;
+    if (!video) return;
+
+    const read = () => {
+      const list = video.audioTracks;
+      if (!list || !list.length) return;
+      const langs: string[] = [];
+      for (let i = 0; i < list.length; i += 1) {
+        const t = list[i];
+        const code = (t?.language || t?.label || "").slice(0, 2).toLowerCase();
+        if (code) langs.push(code);
+        if (
+          audioLang !== "orig" &&
+          code === audioLang &&
+          t
+        ) {
+          t.enabled = true;
+        }
+      }
+      audioTracksRef.current = [];
+      setNativeAudioLanguages(Array.from(new Set(langs)));
+    };
+
+    read();
+    video.addEventListener("loadedmetadata", read);
+    return () => video.removeEventListener("loadedmetadata", read);
+  }, [audioLang, src]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -195,7 +273,7 @@ export function HlsVideoPlayer({
   return (
     <div
       ref={containerRef}
-      className="group relative aspect-video w-full overflow-hidden rounded-2xl bg-black ring-1 ring-white/15"
+      className={`group relative aspect-video w-full overflow-hidden bg-black ring-1 ring-white/15 cue-size-${subtitleSize} ${subtitleBg ? "" : "cue-bg-off"}`}
     >
       <video
         ref={videoRef}
@@ -234,8 +312,20 @@ export function HlsVideoPlayer({
             "Unable to load stream directly. Check URL or select an alternative player source."
           );
         }}
-        className="h-full w-full cursor-pointer object-contain"
-      />
+        crossOrigin="anonymous"
+        className={`h-full w-full cursor-pointer ${fitMode === "cover" ? "object-cover" : "object-contain"}`}
+      >
+        {subtitleTracks.map((track, idx) => (
+          <track
+            key={`${track.lang}-${idx}`}
+            kind="subtitles"
+            src={track.url}
+            srcLang={track.lang}
+            label={track.label}
+            default={activeSubtitleLang !== "off" && track.lang === activeSubtitleLang}
+          />
+        ))}
+      </video>
 
       {/* Top Metadata Bar */}
       <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/80 via-black/30 to-transparent p-4 opacity-95 transition-opacity group-hover:opacity-100">
@@ -258,6 +348,14 @@ export function HlsVideoPlayer({
           <span className="rounded-md border border-white/15 bg-black/60 px-2 py-0.5 text-[11px] font-bold text-violet-200 backdrop-blur">
             {resolutionLabel}
           </span>
+          {nativeAudioLanguages.length > 1 && (
+            <span
+              title="Audio tracks detected in this stream"
+              className="rounded-md border border-white/15 bg-black/60 px-2 py-0.5 text-[11px] font-bold text-emerald-300 backdrop-blur"
+            >
+              {nativeAudioLanguages.length} audio
+            </span>
+          )}
         </div>
       </div>
 

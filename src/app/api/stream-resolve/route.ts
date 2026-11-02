@@ -64,6 +64,22 @@ interface EngineDef {
  */
 export const STREAM_ENGINES: EngineDef[] = [
   {
+    id: "vidpro",
+    provider: "VidPro",
+    label: "VidPro 4K",
+    host: "vidpro.io",
+    tier: 2,
+    timeoutMs: 4000,
+    qualityTag: "VidPro · 4K Multi-Audio + Subtitles",
+    // vidpro.io sits behind Cloudflare bot protection, so a server-side probe
+    // always sees 403. Keep it in the chain for the real browser, where the
+    // challenge is solved normally.
+    allowUnverified: true,
+    movie: (id) => `https://vidpro.io/embed/movie/${id}?autoplay=1`,
+    tv: (id, s, e) =>
+      `https://vidpro.io/embed/tv/${id}/${s}/${e}?autoplay=1&nextEpisode=true&episodeSelector=true`,
+  },
+  {
     id: "vidcore-primary",
     provider: "VidCore",
     label: "VidCore 4K Edge",
@@ -75,20 +91,6 @@ export const STREAM_ENGINES: EngineDef[] = [
       `https://vidcore.org/embed/movie/${id}?autoplay=true&theme=da1b1b`,
     tv: (id, s, e) =>
       `https://vidcore.org/embed/tv/${id}/${s}/${e}?autoplay=true&theme=da1b1b`,
-  },
-  {
-    id: "vidking",
-    provider: "VidKing",
-    label: "VidKing 4K",
-    host: "www.vidking.net",
-    tier: 2,
-    timeoutMs: 4200,
-    qualityTag: "VidKing · 4K Multi-Episode Selector",
-    allowUnverified: true,
-    movie: (id) =>
-      `https://www.vidking.net/embed/movie/${id}?color=e50914&autoPlay=true`,
-    tv: (id, s, e) =>
-      `https://www.vidking.net/embed/tv/${id}/${s}/${e}?color=e50914&autoPlay=true&nextEpisode=true&episodeSelector=true`,
   },
   {
     id: "vidlink",
