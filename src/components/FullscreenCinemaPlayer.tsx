@@ -95,6 +95,8 @@ export function FullscreenCinemaPlayer({
   >([]);
   const [subtitleLoading, setSubtitleLoading] = useState(false);
   const [subtitleNotice, setSubtitleNotice] = useState<string | null>(null);
+  const [detectedAudioLangs, setDetectedAudioLangs] = useState<string[]>([]);
+  const [audioNotice, setAudioNotice] = useState<string | null>(null);
 
   useEffect(() => {
     setStreamIndex(0);
@@ -102,6 +104,7 @@ export function FullscreenCinemaPlayer({
     setIframeLoaded(false);
     setLoadTimedOut(false);
   }, [streams, season, episode, item.id]);
+
 
   useEffect(() => {
     setDrawerSeason(season);
@@ -115,6 +118,10 @@ export function FullscreenCinemaPlayer({
 
   const activeStream: ResolvedStreamOption | undefined =
     streams[streamIndex] || streams[0];
+  useEffect(() => {
+    setDetectedAudioLangs([]);
+    setAudioNotice(null);
+  }, [item.id, season, episode, activeStream?.id]);
 
   // ---- Universal subtitle engine: fetch tracks for this exact title/episode ----
   useEffect(() => {
@@ -173,6 +180,33 @@ export function FullscreenCinemaPlayer({
     season,
     episode,
   ]);
+
+  /**
+   * Embeds are cross-origin: we cannot enumerate or switch their audio tracks.
+   * Only the native player can. Tell the user the truth instead of silently
+   * doing nothing when they pick a language.
+   */
+  const audioSwitchingSupported =
+    Boolean(activeStream) && activeStream!.url.includes(".m3u8");
+  const audioLanguageAvailable =
+    detectedAudioLangs.length > 1 &&
+    (prefs.audioLang === "orig" || detectedAudioLangs.includes(prefs.audioLang));
+
+  useEffect(() => {
+    if (prefs.audioLang === "orig") {
+      setAudioNotice(null);
+      return;
+    }
+    if (!audioSwitchingSupported) {
+      setAudioNotice("This provider controls its own audio — use its in-player track menu");
+      return;
+    }
+    if (detectedAudioLangs.length > 1 && !detectedAudioLangs.includes(prefs.audioLang)) {
+      setAudioNotice(`Stream has no ${prefs.audioLang.toUpperCase()} audio track`);
+      return;
+    }
+    setAudioNotice(null);
+  }, [prefs.audioLang, audioSwitchingSupported, detectedAudioLangs]);
 
   const updatePrefs = useCallback((patch: Partial<PlayerPrefs>) => {
     setPrefs((prev) => {
@@ -448,6 +482,11 @@ export function FullscreenCinemaPlayer({
                   {subtitleNotice}
                 </span>
               )}
+              {audioNotice && prefs.audioLang !== "orig" && (
+                <span className="rounded-md bg-amber-500/15 px-1.5 py-0.5 font-semibold text-amber-300 ring-1 ring-amber-400/25">
+                  {audioNotice}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -481,8 +520,27 @@ export function FullscreenCinemaPlayer({
           </div>
 
           {/* Universal audio engine */}
-          <div className="flex h-10 items-center gap-1.5 rounded-full bg-[#0d0d0d]/80 px-3 ring-1 ring-white/[0.1] backdrop-blur-2xl">
-            <Volume2 className="h-3.5 w-3.5 shrink-0 text-white/70" />
+          <div
+            title={
+              audioSwitchingSupported
+                ? detectedAudioLangs.length > 1
+                  ? `Stream audio tracks: ${detectedAudioLangs.join(", ").toUpperCase()}`
+                  : "This stream exposes a single audio track"
+                : "This provider controls its own audio tracks"
+            }
+            className={`flex h-10 items-center gap-1.5 rounded-full px-3 ring-1 backdrop-blur-2xl ${
+              prefs.audioLang !== "orig" && audioNotice
+                ? "bg-amber-500/20 ring-amber-400/40"
+                : "bg-[#0d0d0d]/80 ring-white/[0.1]"
+            }`}
+          >
+            <Volume2
+              className={`h-3.5 w-3.5 shrink-0 ${
+                prefs.audioLang !== "orig" && audioLanguageAvailable
+                  ? "text-emerald-400"
+                  : "text-white/70"
+              }`}
+            />
             <select
               aria-label="Audio language"
               value={prefs.audioLang}
@@ -490,12 +548,29 @@ export function FullscreenCinemaPlayer({
               onChange={(e) => updatePrefs({ audioLang: e.target.value })}
               className="max-w-[112px] cursor-pointer bg-transparent text-xs font-semibold text-white outline-none sm:max-w-[140px]"
             >
-              {AUDIO_LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code} className="bg-[#171717] text-white">
-                  {l.label}
-                </option>
-              ))}
+              {AUDIO_LANGUAGES.map((l) => {
+                const code = l.code;
+                const unavailable =
+                  code !== "orig" &&
+                  detectedAudioLangs.length > 1 &&
+                  !detectedAudioLangs.includes(code);
+                return (
+                  <option
+                    key={code}
+                    value={code}
+                    className="bg-[#171717] text-white"
+                  >
+                    {l.label}
+                    {unavailable ? " · not in stream" : ""}
+                  </option>
+                );
+              })}
             </select>
+            {detectedAudioLangs.length > 1 && (
+              <span className="rounded bg-emerald-500/20 px-1 text-[10px] font-bold text-emerald-300">
+                {detectedAudioLangs.length}
+              </span>
+            )}
           </div>
 
           {/* Fill / fit toggle */}

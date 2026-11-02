@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import {
   Play,
@@ -41,6 +41,8 @@ interface HlsVideoPlayerProps {
   fitMode?: "cover" | "contain";
   subtitleSize?: "sm" | "md" | "lg";
   subtitleBg?: boolean;
+  /** Reported so the UI can show which audio languages the stream offers. */
+  onAudioTracksDetected?: (languages: string[]) => void;
 }
 
 export function HlsVideoPlayer({
@@ -58,6 +60,7 @@ export function HlsVideoPlayer({
   fitMode = "cover",
   subtitleSize = "md",
   subtitleBg = true,
+  onAudioTracksDetected,
 }: HlsVideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -92,40 +95,106 @@ export function HlsVideoPlayer({
     return () => video.removeEventListener("loadedmetadata", apply);
   }, [activeSubtitleLang, subtitleTracks, src]);
 
-  // ---- Universal audio engine: pick the preferred audio track when offered ----
-  const audioTracksRef = useRef<Array<{ language?: string; label?: string; enabled?: boolean }>>([]);
+  // ---- Universal audio engine ----
+  // Two real mechanisms, because `video.audioTracks` is Safari-only and silently
+  // does nothing in Chrome / Edge / Firefox / Android TV:
+  //   1. hls.js multi-audio renditions  (hls.audioTracks / hls.audioTrack)
+  //   2. native <video>.audioTracks     (Safari, and MP4 with multiple tracks)
+  // Whatever is discovered is reported upward so the UI can show what the
+  // stream actually offers instead of pretending a switch happened.
+  const hlsRef = useRef<Hls | null>(null);
   const [nativeAudioLanguages, setNativeAudioLanguages] = useState<string[]>([]);
 
-  useEffect(() => {
-    const video = videoRef.current as
-      | (HTMLVideoElement & { audioTracks?: { length: number; [i: number]: { language?: string; label?: string; enabled: boolean } } })
-      | null;
-    if (!video) return;
+  const applyAudioLanguage = useCallback(
+    (lang: string) => {
+      if (lang === "orig") return;
 
-    const read = () => {
-      const list = video.audioTracks;
+      // --- hls.js path ---
+      const hls = hlsRef.current;
+      if (hls && hls.audioTracks && hls.audioTracks.length > 1) {
+        const idx = hls.audioTracks.findIndex((t) => {
+          const code = (t.lang || t.name || "").slice(0, 2).toLowerCase();
+          return code === lang;
+        });
+        if (idx >= 0 && hls.audioTrack !== idx) {
+          hls.audioTrack = idx;
+          return;
+        }
+      }
+
+      // --- native path (Safari / multi-track MP4) ---
+      const video = videoRef.current as
+        | (HTMLVideoElement & {
+            audioTracks?: {
+              length: number;
+              [i: number]: {
+                language?: string;
+                label?: string;
+                enabled: boolean;
+              };
+            };
+          })
+        | null;
+      const list = video?.audioTracks;
       if (!list || !list.length) return;
-      const langs: string[] = [];
       for (let i = 0; i < list.length; i += 1) {
         const t = list[i];
         const code = (t?.language || t?.label || "").slice(0, 2).toLowerCase();
-        if (code) langs.push(code);
-        if (
-          audioLang !== "orig" &&
-          code === audioLang &&
-          t
-        ) {
-          t.enabled = true;
+        if (t) t.enabled = code === lang;
+      }
+    },
+    []
+  );
+
+  // Re-apply whenever the preference changes or a new stream loads.
+  useEffect(() => {
+    applyAudioLanguage(audioLang);
+  }, [audioLang, src, applyAudioLanguage, onAudioTracksDetected]);
+
+  // Report which audio languages this stream actually exposes.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const read = () => {
+      const found = new Set<string>();
+
+      const hls = hlsRef.current;
+      if (hls?.audioTracks) {
+        for (const t of hls.audioTracks) {
+          const code = (t.lang || t.name || "").slice(0, 2).toLowerCase();
+          if (code) found.add(code);
         }
       }
-      audioTracksRef.current = [];
-      setNativeAudioLanguages(Array.from(new Set(langs)));
+
+      const native = (
+        video as HTMLVideoElement & {
+          audioTracks?: { length: number; [i: number]: { language?: string; label?: string } };
+        }
+      ).audioTracks;
+      if (native) {
+        for (let i = 0; i < native.length; i += 1) {
+          const code = (native[i]?.language || native[i]?.label || "")
+            .slice(0, 2)
+            .toLowerCase();
+          if (code) found.add(code);
+        }
+      }
+
+      const langs = Array.from(found);
+      setNativeAudioLanguages(langs);
+      onAudioTracksDetected?.(langs);
+      applyAudioLanguage(audioLang);
     };
 
     read();
     video.addEventListener("loadedmetadata", read);
-    return () => video.removeEventListener("loadedmetadata", read);
-  }, [audioLang, src]);
+    video.addEventListener("canplay", read);
+    return () => {
+      video.removeEventListener("loadedmetadata", read);
+      video.removeEventListener("canplay", read);
+    };
+  }, [audioLang, src, applyAudioLanguage]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -142,8 +211,25 @@ export function HlsVideoPlayer({
         enableWorker: true,
         lowLatencyMode: isLive,
       });
+      hlsRef.current = hls;
       hls.loadSource(src);
       hls.attachMedia(video);
+
+      const syncAudioTracks = () => {
+        if (!hls?.audioTracks?.length) return;
+        const langs = Array.from(
+          new Set(
+            hls.audioTracks
+              .map((t) => (t.lang || t.name || "").slice(0, 2).toLowerCase())
+              .filter(Boolean)
+          )
+        );
+        setNativeAudioLanguages(langs);
+        onAudioTracksDetected?.(langs);
+        applyAudioLanguage(audioLang);
+      };
+      hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, syncAudioTracks);
+      hls.on(Hls.Events.MANIFEST_PARSED, syncAudioTracks);
 
       hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
         setBuffering(false);
@@ -205,6 +291,7 @@ export function HlsVideoPlayer({
     return () => {
       if (hls) {
         hls.destroy();
+        hlsRef.current = null;
       }
     };
   }, [src, isLive, autoPlay, initialSeconds]);
