@@ -190,6 +190,8 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
       season: String(season),
       episode: String(episode),
     });
+    // Anime has its own sub/dub provider keyed by AniList id.
+    if (item.anilistId) qs.set("anilistId", String(item.anilistId));
 
     fetch(`/api/stream-resolve?${qs.toString()}`)
       .then((r) => (r.ok ? r.json() : null))
@@ -208,7 +210,7 @@ export function DuloTitleInfoView({ type, id }: { type: string; id: string }) {
     return () => {
       cancelled = true;
     };
-  }, [item?.id, item?.tmdbId, item?.tmdbMediaType, season, episode]);
+  }, [item?.id, item?.tmdbId, item?.tmdbMediaType, item?.anilistId, season, episode]);
 
   const loadReviews = useCallback(async () => {
     try {

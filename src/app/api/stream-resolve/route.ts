@@ -55,6 +55,11 @@ interface EngineDef {
   allowUnverified?: boolean;
   movie?: (tmdbId: string) => string;
   tv?: (tmdbId: string, season: number, episode: number) => string;
+  /**
+   * Anime-only engines keyed by AniList id. `dub` selects the English-dub
+   * stream, which is a genuinely separate HLS source (not a label).
+   */
+  anime?: (anilistId: number, episode: number, lang: "sub" | "dub") => string;
 }
 
 /**
@@ -63,6 +68,30 @@ interface EngineDef {
  * NO vidsrc-family engine is registered.
  */
 export const STREAM_ENGINES: EngineDef[] = [
+  {
+    id: "megavid-sub",
+    provider: "Anime · Sub",
+    label: "Anime (Japanese audio + subs)",
+    host: "megavid.buzz",
+    tier: 0,
+    timeoutMs: 5000,
+    qualityTag: "Anime · Japanese Audio + Multi-Sub",
+    // megavid throttles datacenter IPs, so the server probe often times out
+    // even though a real browser loads it fine. Keep it in the chain.
+    allowUnverified: true,
+    anime: (alId, ep) => `https://megavid.buzz/ani/${alId}/${ep}/sub`,
+  },
+  {
+    id: "megavid-dub",
+    provider: "Anime · Dub",
+    label: "Anime (English dub)",
+    host: "megavid.buzz",
+    tier: 1,
+    timeoutMs: 5000,
+    qualityTag: "Anime · English Dub",
+    allowUnverified: true,
+    anime: (alId, ep) => `https://megavid.buzz/ani/${alId}/${ep}/dub`,
+  },
   {
     id: "vidpro",
     provider: "VidPro",
@@ -362,13 +391,26 @@ export async function GET(req: NextRequest) {
         : typeParam !== "movie";
 
   // Build the candidate list for this title kind, in tier order.
-  const candidates = STREAM_ENGINES.filter((engine) =>
-    isEpisodic ? Boolean(engine.tv) : Boolean(engine.movie)
-  ).map((engine) => ({
+  const anilistId = Number(
+    req.nextUrl.searchParams.get("anilistId") || catalogMatch?.anilistId || 0
+  );
+  const isAnime = typeParam === "anime" || catalogMatch?.type === "anime";
+  const useAnimeEngines = isAnime && Number.isFinite(anilistId) && anilistId > 0;
+
+  const candidates = STREAM_ENGINES.filter((engine) => {
+    if (useAnimeEngines && engine.anime) return true;
+    return isEpisodic ? Boolean(engine.tv) : Boolean(engine.movie);
+  }).map((engine) => ({
     engine,
-    url: isEpisodic
-      ? engine.tv!(tmdbId, season, episode)
-      : engine.movie!(tmdbId),
+    url: engine.anime && useAnimeEngines
+      ? engine.anime(
+          anilistId,
+          episode,
+          engine.id.endsWith("-dub") ? "dub" : "sub"
+        )
+      : isEpisodic
+        ? engine.tv!(tmdbId, season, episode)
+        : engine.movie!(tmdbId),
   }));
 
   const probed = await Promise.all(
@@ -416,6 +458,15 @@ export async function GET(req: NextRequest) {
     qualityTag: engine.qualityTag,
   }));
 
+  // Anime sub/dub providers lead anime playback.
+  const animeFirst = (list: ResolvedStreamOption[]) =>
+    useAnimeEngines
+      ? [
+          ...list.filter((s) => s.id.startsWith("megavid-")),
+          ...list.filter((s) => !s.id.startsWith("megavid-")),
+        ]
+      : list;
+
   const ordered: ResolvedStreamOption[] =
     healthy.length > 0
       ? [
@@ -429,6 +480,8 @@ export async function GET(req: NextRequest) {
         ]
       : fallbackOrdered;
 
+  const finalOrdered = animeFirst(ordered);
+
   const engines: EngineReport[] = probed
     .map((p, idx) => ({
       id: p.report.id,
@@ -440,7 +493,7 @@ export async function GET(req: NextRequest) {
     }))
     .sort((a, b) => a.tier - b.tier);
 
-  const primary = ordered[0];
+  const primary = finalOrdered[0];
 
   return NextResponse.json({
     primary:
@@ -452,10 +505,10 @@ export async function GET(req: NextRequest) {
         latencyMs: 320,
         qualityTag: "VidBolt · HD Primary · Multi-Sub",
       },
-    backups: ordered.slice(1),
+    backups: finalOrdered.slice(1),
     engines,
     prioritizedProvider: primary?.provider ?? "VidBolt",
-    engineCount: ordered.length,
+    engineCount: finalOrdered.length,
     blockedFamilies: ["vidsrc"],
     autoResolved: true,
     tmdbId,

@@ -50,6 +50,8 @@ export interface TmdbReviewExcerpt {
 export interface CatalogItem {
   id: string;
   tmdbId: string;
+  /** AniList id — used by the anime audio/subtitle provider (sub + dub). */
+  anilistId?: number;
   tmdbMediaType: "movie" | "tv";
   type: MediaType;
   title: string;
@@ -1402,6 +1404,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "1429",
     tmdbId: "1429",
+    anilistId: 16498,
     tmdbMediaType: "tv",
     type: "anime",
     title: "Attack on Titan",
@@ -1449,6 +1452,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "85937",
     tmdbId: "85937",
+    anilistId: 101922,
     tmdbMediaType: "tv",
     type: "anime",
     title: "Demon Slayer: Kimetsu no Yaiba",
@@ -1490,6 +1494,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "95479",
     tmdbId: "95479",
+    anilistId: 113415,
     tmdbMediaType: "tv",
     type: "anime",
     title: "JUJUTSU KAISEN",
@@ -1531,6 +1536,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "127532",
     tmdbId: "127532",
+    anilistId: 151807,
     tmdbMediaType: "tv",
     type: "anime",
     title: "Solo Leveling",
@@ -1565,6 +1571,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "209867",
     tmdbId: "209867",
+    anilistId: 154587,
     tmdbMediaType: "tv",
     type: "anime",
     title: "Frieren: Beyond Journey's End",
@@ -1599,6 +1606,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "31911",
     tmdbId: "31911",
+    anilistId: 5114,
     tmdbMediaType: "tv",
     type: "anime",
     title: "Fullmetal Alchemist: Brotherhood",
@@ -1637,6 +1645,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "13916",
     tmdbId: "13916",
+    anilistId: 1535,
     tmdbMediaType: "tv",
     type: "anime",
     title: "Death Note",
@@ -1679,6 +1688,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "105248",
     tmdbId: "105248",
+    anilistId: 120377,
     tmdbMediaType: "tv",
     type: "anime",
     title: "Cyberpunk: Edgerunners",
@@ -1716,6 +1726,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "129",
     tmdbId: "129",
+    anilistId: 199,
     tmdbMediaType: "movie",
     type: "anime",
     title: "Spirited Away",
@@ -1747,6 +1758,7 @@ export const CATALOG_MEDIA: CatalogItem[] = [
   {
     id: "372058",
     tmdbId: "372058",
+    anilistId: 21519,
     tmdbMediaType: "movie",
     type: "anime",
     title: "Your Name.",
